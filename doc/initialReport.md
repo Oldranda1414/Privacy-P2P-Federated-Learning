@@ -4,7 +4,9 @@
 
 ## Abstract
 
-This project is an implementation of the algorithm proposed in [1].The
+This project is an implementation of the algorithm proposed in "Tobias Wink and Zoltan Nochta. An approach for peer-to-peer federated learning.
+In 2021 51st Annual IEEE/IFIP International Conference on Dependable Systems
+and Networks Workshops (DSN-W), pages 150–157, 2021.". The
 goal is to simulate peer-to-peer Federated Learning implementing an n-out-
 of-n secret sharing schema and Secure Average Computation algorithm to let
 the peers collaborate in the training of a Neural Network, without the risk
