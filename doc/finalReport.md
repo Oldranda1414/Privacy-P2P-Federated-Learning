@@ -4,7 +4,7 @@
 
 ## Abstract
 
-This project is an implementation of the algorithm proposed in "Tobias Wink and Zoltan Nochta, An approach for peer-to-peer federated learning, In 2021 51st Annual IEEE/IFIP International Conference on Dependable Systems and Networks Workshops (DSN-W), pages 150–157, 2021". The
+This project is an implementation of the algorithm proposed in \[[Wink et al., 2021][1]\].The
 goal is to simulate peer-to-peer Federated Learning implementing an n-out-
 of-n secret sharing schema and Secure Average Computation algorithm to let
 the peers collaborate in the training of a Neural Network, without the risk
@@ -14,20 +14,46 @@ and weaknesses of the approach.
 
 ## Goal/Requirements
 
-Detailed description of the project goals, requirements, and expected outcomes.
+The project implements the Secure Average Computation (SAC) algorithm proposed in \[[Wink et al., 2021][1]\] to implement a distributed system with the following characteristics:
 
-Use case Diagrams, examples, or Q/A simulations are welcome.
+- Peer to peer: no central server, all members of the system have the same role
+- Federated Learning: the peers collaborate in the training of a common machine learning model for which every peer contributes with part of the training dataset
+- Data privacy: every peer has knowledge only on it's own dataset and does not acquire knowledge of the other peers' datasets
+
+The deliverable enables the user to easily repeat the [considered scenarios](#scenarios) and also provides some options to further tweak the scenarios for further insight.
 
 ### Scenarios
 
-Informal description of the ways users are expected to interact with your project.
-It should describe _how_ and _why_ a user should use / interact with the system.
+To test the effectiveness of the approach proposed in \[[Wink et al., 2021][1]\] the following scenarios will be implemented:
 
-### Self-assessment policy
+#### Base Scenarios
 
-How should the quality of the produced software be assessed?
+Base Scenarios implement systems where behaviour is as expected, as in all peers are honest and fully collaborate to generate the best model possible.
 
-How should the effectiveness of the project outcomes be assessed?
+These scenarios are a benchmark to test the efficency of the approach for different machine learning problems and models.
+
+These scenarios are also a control cases for the [Failure Scenarios](#failure-scenarios).
+
+The following ML problems and models will be tested:
+
+<!-- TODO ADD THIS PART TAKING INSIPRATION BY MACHINE LEARNING BOOK -->
+
+#### Failure Scenarios
+
+Failure Scenarios implement the following anomalous cases:
+
+- Crash failure: a peer stops working or is disconnected from the network;
+- Byzantine failure: a peer sends random data, jeopardizing the training of the neural network;
+
+<!-- consider adding the case where a node disconnects and then reconnects or where a new peer simply adds itself to the network -->
+
+#### Centralized scenarios
+
+Centralized Scenarios act as control cases for the [Base Scenarios](#base-scenarios), by merely implementing the same neural networks with the same datasets of the [Base Scenarios](#base-scenarios) in a centralized manner.
+
+For completeness' sake a list of all problems and models implemented follows:
+
+<!-- TODO ADD THESE BASED ON DECISIONS MADE IN BASE SCENARIOS-->
 
 ## Requirements Analysis
 
@@ -112,3 +138,7 @@ Racap what you did __not__
 ### What did we learned
 
 Racap what did you learned
+
+<!-- linked references -->
+
+[1]: https://ieeexplore.ieee.org/document/9502443
