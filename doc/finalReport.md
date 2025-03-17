@@ -57,15 +57,11 @@ For completeness' sake a list of all problems and models implemented follows:
 
 ## Requirements Analysis
 
-Is there any implicit requirement hidden within this project's requirements?
+The best suited language for machine learning projects is python, so this is the language that will be used
 
-Is there any implicit hypothesis hidden within this project's requirements?
+The various cases will be implemented as docker projects and a shell script will be implemented to enable the user to easily define the scenario that should be executed using command line parameters.
 
-Are there any non-functional requirements implied by this project's requirements?
-
-What model/paradigm/techonology is the best suited to face this project's requirements?
-
-What's the abstraction gap among the available models/paradigms/techonologies and the problem to be solved?
+<!-- TODO ADD SPECIFIC LIBRARIES USED AT PROJECT END -->
 
 ## Design
 
@@ -135,7 +131,7 @@ Recap what you did
 
 Racap what you did __not__
 
-### What did we learned
+### What I learned
 
 Racap what did you learned
 
