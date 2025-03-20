@@ -65,12 +65,7 @@ The various cases will be implemented as docker projects and a shell script will
 
 ## Design
 
-This is where the logical/abstract contribution of the project is presented.
-
-Notice that, when describing a software project, three dimensions need to be taken into account: structure, behaviour, and interaction.
-
-Always remember to report __why__ a particular design has been choosen.
-Reporting wrog design choices which has been evalued during the design phase is welcome too.
+<!-- TODO SEE IF SOMETHING SHOULD BE SAID HERE -->
 
 ### Structure
 
