@@ -38,6 +38,8 @@ The following ML problems and models will be tested:
 
 <!-- TODO ADD THIS PART TAKING INSIPRATION BY MACHINE LEARNING BOOK -->
 
+<!--TODO consider old model vs new model performance in control and distributed case -->
+
 #### Failure Scenarios
 
 Failure Scenarios implement the following anomalous cases:
