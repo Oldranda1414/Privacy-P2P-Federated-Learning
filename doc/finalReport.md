@@ -4,13 +4,7 @@
 
 ## Abstract
 
-This project is an implementation of the algorithm proposed in \[[Wink et al., 2021][1]\].The
-goal is to simulate peer-to-peer Federated Learning implementing an n-out-
-of-n secret sharing schema and Secure Average Computation algorithm to let
-the peers collaborate in the training of a Neural Network, without the risk
-of direct or indirect training data theft, allowing the presence of semi-honest
-peers. The project will showcase some emblematic cases probing strengths
-and weaknesses of the approach.
+This project is an implementation of the algorithm proposed in \[[Wink et al., 2021][1]\].The goal is to simulate peer-to-peer Federated Learning implementing an n-out- of-n secret sharing schema and Secure Average Computation algorithm to let the peers collaborate in the training of a Neural Network, without the risk of direct or indirect training data theft, allowing the presence of semi-honest peers. The project will showcase some emblematic cases probing strengths and weaknesses of the approach.
 
 ## Goal/Requirements
 
