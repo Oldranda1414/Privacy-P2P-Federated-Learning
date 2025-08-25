@@ -77,3 +77,11 @@ Actually really thinking about it the project is peer 2 peer by definition, so i
 TODO
 Remember to say that the protocol is leaderless (see lines above if confused)
 
+### M10
+
+TODO define the type of the comunication model chosen for the project:
+
+- message-passing communication
+- control-oriented communication
+- data-oriented communication
+
