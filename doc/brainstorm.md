@@ -2,6 +2,10 @@
 
 ## tech
 
+### nix
+
+nix flake for devenv configuration
+
 ### UV
 
 use UV for python build system
@@ -21,6 +25,20 @@ use Rich for pretty terminal output
 
 Should the case where a group of peers are training and another one joins at some point be considered or should the max number of peers (considering failures) be known at all times? (I would like the second case, to counter scope creep)
 
+## add to doc
+
+### CAP
+
+It seems obvious that the project should sacrifice A(vailibility), as P(artition) always occurs and C(onsistency) seems paramount.
+
+Eventual Consistency could be considered, but seems to much of a hassle to work with, so simply renouncing A(vailibility) seems the simplest and safest option.
+
+TODO ask chatgpt what it thinks of this once project requirements are available.
+### graphs
+
+class diagram, duh
+actors (& components?)
+
 ## Study notes
 
 ### C1
@@ -32,7 +50,7 @@ The modern vision of the CAP theorem is that Availibility and Consistency should
 TODO
 For this project I think that a protocol could be enacted when partition occurs. If only one node does not respond then a timer could be initialized after which all nodes shutdown, saving their results.
 
-A more complex solution could have the nodes reorganize if a constant partition occurs.
+A more complex solution could have the nodes reorganize if a non temporary partition occurs.
 
 ### C2
 
