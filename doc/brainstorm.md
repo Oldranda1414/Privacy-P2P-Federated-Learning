@@ -1,5 +1,57 @@
 # brainstorm
 
+## design
+
+Probably the best way to design the nodes is with a finite state machine. Ideally a simple module could be made to create finite state machines
+```mermaid
+class FiniteStateMachine {
+    __init__(list[State])
+    start()
+}
+
+class State {
+    __init__(name: str, func: Callable)
+}
+
+with func = (): str
+
+```
+
+example modified from chatgpt
+
+```py
+class FSM:
+    def __init__(self, handlers: dict[str, Callable[str]], initial_state: str):
+        self.state = initial_state
+        self.handlers = handlers
+
+    def run(self):
+        """Run the handler of the current state"""
+        if self.state not in self.handlers:
+            raise ValueError(f"No handler for state {self.state}")
+        # The handler returns the next state
+        self.state = self.handlers[self.state]()
+
+# Example usage
+def idle_handler():
+    print("Currently IDLE")
+    return "active"
+
+def active_handler():
+    print("Currently ACTIVE")
+    return "idle"
+
+# Build FSM
+fsm = FSM("idle", {
+    "idle": idle_handler
+    "active": active_handler
+})
+
+fsm.run()
+
+```
+ 
+
 ## tech
 
 ### nix
@@ -76,6 +128,24 @@ Actually really thinking about it the project is peer 2 peer by definition, so i
 
 TODO
 Remember to say that the protocol is leaderless (see lines above if confused)
+
+### M2
+
+TODO Define what type of faluts can occur and how they are handled or removed.
+
+TODO dependability of systems can be expressed in terms of availability, reliability, safety, maintainability. Evaluate if this should be done in some manner for the project
+
+### M6
+
+TODO define a specific architectural style for the project:
+
+- layered architecture
+- object-based architecture
+- data-centered architecture
+- event-based architecture
+- shared data-space architecture
+
+maybe give a look at the book to better understand this stuff
 
 ### M10
 
