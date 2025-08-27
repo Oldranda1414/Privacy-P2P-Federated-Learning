@@ -50,7 +50,8 @@ fsm = FSM("idle", {
 fsm.run()
 
 ```
- 
+
+Due to the possible high computational, and consequently time, cost of the training step, probably it would be necessary for the nodes to poll eachother to make sure they are all alive and well, or the training step might be rendered useless if one node fails.
 
 ## tech
 
