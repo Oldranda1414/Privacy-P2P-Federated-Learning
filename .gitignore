@@ -1,0 +1,6 @@
+# direnv config file
+.envrc
+
+# generated images folder
+doc/assets/mermaid
+

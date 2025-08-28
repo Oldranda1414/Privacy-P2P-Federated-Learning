@@ -1,0 +1,13 @@
+---
+title: AutoDev Architecture
+---
+flowchart TD
+    Interface-->|calls|Dispatcher
+    Dispatcher-->|calls|Handlers
+    Handlers-->|uses|Services
+    Services-->|comprehends|Generator
+    Services-->|comprehends|Output
+    Services-->|comprehends|Prompt
+    Services-->|comprehends|Model
+    Generator-->|uses|Prompt
+    Generator-->|uses|Model

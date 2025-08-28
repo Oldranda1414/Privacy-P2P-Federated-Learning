@@ -6,7 +6,7 @@
 
 This project is an implementation of the algorithm proposed in \[[Wink et al., 2021][1]\].The goal is to simulate peer-to-peer Federated Learning implementing an n-out- of-n secret sharing schema and Secure Average Computation algorithm to let the peers collaborate in the training of a Neural Network, without the risk of direct or indirect training data theft, allowing the presence of semi-honest peers. The project will showcase some emblematic cases probing strengths and weaknesses of the approach.
 
-## Goal/Requirements
+## Goal
 
 The project implements the Secure Average Computation (SAC) algorithm proposed in \[[Wink et al., 2021][1]\] to implement a distributed system with the following characteristics:
 
@@ -14,54 +14,82 @@ The project implements the Secure Average Computation (SAC) algorithm proposed i
 - Federated Learning: the peers collaborate in the training of a common machine learning model for which every peer contributes with part of the training dataset
 - Data privacy: every peer has knowledge only on it's own dataset and does not acquire knowledge of the other peers' datasets
 
-The deliverable enables the user to easily repeat the [considered scenarios](#scenarios) and also provides some options to further tweak the scenarios for further insight.
+The deliverable enables the user to easily repeat the [considered scenarios](#scenarios).
 
 ### Scenarios
 
-To test the effectiveness of the approach proposed in \[[Wink et al., 2021][1]\] the following scenarios will be implemented:
+To test the effect of SAC the following scenarios have been implemented:
 
-#### Base Scenarios
-
-Base Scenarios implement systems where behaviour is as expected, as in all peers are honest and fully collaborate to generate the best model possible.
-
-These scenarios are a benchmark to test the efficency of the approach for different machine learning problems and models.
-
-These scenarios are also a control cases for the [Failure Scenarios](#failure-scenarios).
-
-The following ML problems and models will be tested:
-
-<!-- TODO ADD THIS PART TAKING INSIPRATION BY MACHINE LEARNING BOOK -->
-
-<!--TODO consider old model vs new model performance in control and distributed case -->
-
-#### Failure Scenarios
-
-Failure Scenarios implement the following anomalous cases:
-
-- Crash failure: a peer stops working or is disconnected from the network;
-- Byzantine failure: a peer sends random data, jeopardizing the training of the neural network;
-
-<!-- consider adding the case where a node disconnects and then reconnects or where a new peer simply adds itself to the network -->
-
-#### Centralized scenarios
-
-Centralized Scenarios act as control cases for the [Base Scenarios](#base-scenarios), by merely implementing the same neural networks with the same datasets of the [Base Scenarios](#base-scenarios) in a centralized manner.
-
-For completeness' sake a list of all problems and models implemented follows:
-
-<!-- TODO ADD THESE BASED ON DECISIONS MADE IN BASE SCENARIOS-->
+- **Control Scenario** : centralized machine learning training
+- **Base Scenario** : P2P machine learning with SAC and IID (Independent and Identically Distributed) data distributions across peers
+- **Extreme Scenario** : P2P machine learning with SAC and IID (Independent and Identically Distributed) data distributions across peers
 
 ## Requirements Analysis
 
-The best suited language for machine learning projects is python, so this is the language that will be used
+<!-- TODO check if these are right -->
+
+<!-- TODO check the commented ones -->
+
+During project analysis the following requirements have been identified.
+
+1. **Business Requirements**
+    1. The system should demonstrate a practical application of advanced distributed systems and privacy-preserving computation concepts for an academic context.
+    1. The system should enable the comparison of a novel federated learning algorithm (SAC) against a traditional centralized baseline to evaluate its efficacy and overhead.
+1. **Domain Requirements**
+    1. The implementation of the SAC protocol must adhere to algorithmic specifications outlined in [Wink et al., 2021].
+    1. The system must operate in a true peer-to-peer (P2P) topology, with no central server managing the learning process or aggregating model parameters.
+    <!-- 1. The global machine learning model must be a linear model (e.g., Logistic Regression or Linear SVM) whose training can be expressed as an averaging of local parameters. -->
+    1. The system must guarantee data privacy: a peer must not be able to derive the raw data or the class distribution of any other peer from the messages it receives.
+    1. The system must be capable of converging to a globally trained model despite non-IID (Independent and Identically Distributed) data distributions across peers.
+1. **Functional Requirements**
+    1. **User Functional Requirements**
+        1. Main Usage
+            1. Users (the experimenter) must be able to run the system to execute the control scenario (centralized training) on a specified dataset and save the results.
+            1. Users must be able to run the system to execute the base scenario (SAC with IID data distribution across peers) and save the results.
+            1. Users must be able to run the system to execute the extreme scenario (SAC with highly non-IID, class-skewed data distribution) and save the results.
+            1. Users must be able to define key experiment parameters via a configuration file or command-line arguments (e.g., number of peers, number of training rounds, dataset path, learning rate).
+        1. Results & Analysis
+            1. Users must be able to view the final accuracy and loss of the trained model for each executed scenario.
+            1. Users must be able to generate plots comparing the convergence (accuracy/loss over training rounds) of the different scenarios.
+    1. **System Functional Requirements**
+        1. Centralized Training (Control Scenario)
+            1. The system must implement a standard centralized training algorithm on the entire dataset to produce a baseline model.
+        1. P2P Network Management
+            1. The system must instantiate a configurable number of peer processes.
+            1. Peers must be able to exchange messages directly with their neighbors in the P2P overlay.
+        1. Federated Learning with SAC
+            1. Each peer must train a local model on its own subset of the data.
+            1. Each peer must execute the SAC protocol to securely mask its model parameters before broadcasting them.
+            1. Each peer must collect masked parameters from all other peers, combine them, and remove its own mask to reveal the secure average.
+            1. Each peer must update its local model with the securely averaged global parameters.
+            1. This process must repeat for a configurable number of training rounds or until a convergence criterion is met.
+        1. Data Handling
+            1. The system must partition a provided dataset (e.g., MNIST, CIFAR-10) among the peers according to the selected scenario (balanced for base, class-skewed for extreme).
+1. **Non-Functional Requirements**
+    1. Correctness & Reliability: The results of the SAC scenarios must be verifiable and reproducible across multiple runs with the same configuration.
+    1. Usability: The process of configuring and running the three scenarios must be well-documented and require minimal manual setup.
+    1. Maintainability: The code must be modular, separating concerns like P2P communication, the SAC protocol, ML training, and data loading, to facilitate understanding and usage.
+    1. Performance: The system should be designed to complete a experiment with a typical configuration (e.g., 10 peers, 100 rounds) in a reasonable time frame on a single development machine (using processes/localhost). Performance optimization for a real distributed setting is not a primary goal.
+5. **Implementation Requirements**
+    1. The system should be implemented in Python, leveraging common libraries for machine learning (e.g., PyTorch, Scikit-learn) and networking (e.g., socket, asyncio, or a high-level framework like libp2p).
+    1. The deliverable must be a structured Python project that can be executed from the command line, not just a single script.
+    1. The project must include a comprehensive README.md file with instructions for installation, dependency management, and usage.
+
+### Technologies
+
+To configure a reproducible development environment [Nix](https://nixos.org/) will be used.
 
 The various cases will be implemented as docker projects and a shell script will be implemented to enable the user to easily define the scenario that should be executed using command line parameters.
 
-<!-- TODO ADD SPECIFIC LIBRARIES USED AT PROJECT END -->
+To configure the docker containers [Nix](https://nixos.org/) will be used.
+
+The de facto standard language for machine learning projects is python, so this is the language that will be used.
+
+For python project management [Uv](https://docs.astral.sh/uv/) will be used.
+
+[Just](https://github.com/casey/just) is used to simplify running cli commands.
 
 ## Design
-
-<!-- TODO SEE IF SOMETHING SHOULD BE SAID HERE -->
 
 ### Structure
 
@@ -102,17 +130,32 @@ In case of a test-driven development, describe tests here and possibly report th
 
 ## Deployment Instructions
 
-Explain here how to install and launch the produced software artifacts.
-Assume the softaware must be installed on a totally virgin environment.
-So, report __any__ conviguration step.
+Project tool dependencies are defined by a Nix flake.
 
-Gradle and Docker may be useful here to ensure the deployment and launch processes to be easy.
+This means that the only required dependency for the project is for [Nix](https://nixos.org/download/) to be installed.
+
+To enter the projects development environment, execute the following command while in the repository root:
+
+```sh
+nix develop
+```
 
 ## Usage Examples
 
-Show how to use the produced software artifacts.
+[Just](https://github.com/casey/just) is used to simplify running cli commands.
 
+To see available commands:
+
+```sh
+just
+```
+
+<!-- TODO complete this -->
+
+<!-- INSTRUCTIONS
+Show how to use the produced software artifacts.
 Ideally, there should be at least one example for each scenario proposed above.
+-->
 
 ## Conclusion
 
