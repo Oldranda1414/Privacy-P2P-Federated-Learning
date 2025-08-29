@@ -29,7 +29,7 @@ fi
 for FILE in "$SRC_FOLDER"/*.mmd; do
   if [[ -f "$FILE" ]]; then
     BASENAME=$(basename "$FILE" .mmd)
-    mmdc -i "$FILE" -o "$OUT_FOLDER"/"$BASENAME".png -t dark -b '#0d1117' -q --scale 2
+    mmdc -i "$FILE" -o "$OUT_FOLDER"/"$BASENAME".png -q --scale 2
   fi
 done
 
@@ -38,5 +38,5 @@ BASENAME="full_diag"
 FILE="$SRC_FOLDER/$BASENAME.mmd"
 
 if [[ -f "$FILE" ]]; then
-  mmdc -i "$FILE" -o "$OUT_FOLDER"/"$BASENAME".png -t dark -b '#0d1117' -q --scale 7
+  mmdc -i "$FILE" -o "$OUT_FOLDER"/"$BASENAME".png -q --scale 7
 fi

@@ -3,5 +3,6 @@
 .direnv
 
 # generated images folder
+doc/build
 doc/assets/mermaid
 

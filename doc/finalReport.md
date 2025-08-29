@@ -167,7 +167,9 @@ Racap what you did __not__
 
 ### What I learned
 
-Racap what did you learned
+Racap what did you learn
+
+![example](./assets/mermaid/architecture.png)
 
 <!-- linked references -->
 
