@@ -1,4 +1,6 @@
-# Progect Final Report Template
+# Project Final Report Template
+
+<!-- copied this template: https://github.com/pikalab-unibo/sd-project-rules/blob/main/final-report-template.md -->
 
 [Leonardo Randacio](leonardo.randacio@studio.unibo.it)
 
@@ -66,13 +68,11 @@ During project analysis the following requirements have been identified.
         1. Data Handling
             1. The system must partition a provided dataset (e.g., MNIST, CIFAR-10) among the peers according to the selected scenario (balanced for base, class-skewed for extreme).
 1. **Non-Functional Requirements**
-    1. Correctness & Reliability: The results of the SAC scenarios must be verifiable and reproducible across multiple runs with the same configuration.
-    1. Usability: The process of configuring and running the three scenarios must be well-documented and require minimal manual setup.
-    1. Maintainability: The code must be modular, separating concerns like P2P communication, the SAC protocol, ML training, and data loading, to facilitate understanding and usage.
-    1. Performance: The system should be designed to complete a experiment with a typical configuration (e.g., 10 peers, 100 rounds) in a reasonable time frame on a single development machine (using processes/localhost). Performance optimization for a real distributed setting is not a primary goal.
+    1. The results of the SAC scenarios must be verifiable and reproducible across multiple runs with the same configuration.
+    1. The process of configuring and running the three scenarios must be well-documented and require minimal manual setup.
+    1. The code must be modular, separating concerns like P2P communication, the SAC protocol, ML training, and data loading, to facilitate understanding and usage.
+    1. The system should be designed to complete a experiment with a typical configuration (e.g., 10 peers, 100 rounds) in a reasonable time frame on a single development machine (using processes/localhost). Performance optimization for a real distributed setting is not a primary goal.
 5. **Implementation Requirements**
-    1. The system should be implemented in Python, leveraging common libraries for machine learning (e.g., PyTorch, Scikit-learn) and networking (e.g., socket, asyncio, or a high-level framework like libp2p).
-    1. The deliverable must be a structured Python project that can be executed from the command line, not just a single script.
     1. The project must include a comprehensive README.md file with instructions for installation, dependency management, and usage.
 
 ### Technologies
@@ -130,15 +130,27 @@ In case of a test-driven development, describe tests here and possibly report th
 
 ## Deployment Instructions
 
-Project tool dependencies are defined by a Nix flake.
+The only project dependency necessary to run the simulations is (Docker)[https://www.docker.com/].
 
-This means that the only required dependency for the project is for [Nix](https://nixos.org/download/) to be installed.
+Unfortunately Docker's installation is not provided by Nix development environment functionalities, as it seems (there is currently no good mechanism for configuring services on non-NixOS hosts)[https://discourse.nixos.org/t/how-to-run-docker-daemon-from-nix-not-nixos/43413/2]. This means that docker must be installed 'manually'.
+
+The easiest way to get Docker (and it's many products) installed is by installing (Docker Desktop)[https://docs.docker.com/desktop/].
+
+## Development Instructions
+
+Project tool dependencies, apart from Docker, are defined by a Nix flake.
+
+To install the development dependencies of the project [Nix](https://nixos.org/download/) must be installed.
 
 To enter the projects development environment, execute the following command while in the repository root:
 
 ```sh
 nix develop
 ```
+
+Unfortunately Docker's installation is not provided by Nix development environment functionalities, as it seems (there is currently no good mechanism for configuring services on non-NixOS hosts)[https://discourse.nixos.org/t/how-to-run-docker-daemon-from-nix-not-nixos/43413/2]. This means that docker must be installed 'manually'.
+
+The easiest way to get Docker (and it's many products) installed is by installing (Docker Desktop)[https://docs.docker.com/desktop/].
 
 ## Usage Examples
 
