@@ -93,13 +93,17 @@ For python project management [Uv](https://docs.astral.sh/uv/) will be used.
 
 ### Structure
 
+<!--
 Which entities need to by modelled to solve the problem?
-
 (UML Class diagram)
 
 How should entities be modularised?
-
 (UML Component/Package/Deployment Diagrams)
+-->
+
+TODO Pinging????
+
+![High Level Design](./assets/mermaid/hldesign.png)
 
 ### Behaviour
 

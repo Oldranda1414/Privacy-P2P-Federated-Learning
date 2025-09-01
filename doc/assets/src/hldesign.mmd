@@ -1,0 +1,35 @@
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+  layout: elk
+---
+classDiagram
+    class FiniteStateMachine {
+        \_\_init\_\_(initalState: State, states: list[State])
+        run()
+    }
+
+    class Model {
+        \_\_init\_\_(architecture: Architecture, data: Dataset)
+        step()
+        getWeights() list[Weight]
+    }
+
+    class Dataset {
+        \_\_init\_\_(file_path: str)
+        TODO complete this with stuff necessary
+    }
+
+    class SecureAverageComputation {
+        execute(weights: list[Weight], peers: list[Peers])
+    }
+
+    FiniteStateMachine ..> Model
+    FiniteStateMachine ..> State
+    Model ..> Dataset
+    Model ..> Architecture
+    Model ..> Weight
+    SecureAverageComputation ..> Weight
+    SecureAverageComputation ..> Peers
+
