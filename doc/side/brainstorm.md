@@ -156,3 +156,11 @@ TODO define the type of the comunication model chosen for the project:
 - control-oriented communication
 - data-oriented communication
 
+## Agile steps
+
+- docker python ping pong (with configurable number of peers)
+- fsm with background polling (not sure this is the best solution, think about this)
+- data load
+- SAC with dummy data (checkout how to do sync with p2p)
+- ai
+
