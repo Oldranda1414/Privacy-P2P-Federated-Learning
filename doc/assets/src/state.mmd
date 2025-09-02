@@ -1,0 +1,22 @@
+---
+config:
+  theme: base
+  look: classic
+---
+stateDiagram-v2
+    [*] --> Setup
+
+    Setup --> Executing : connected to peers / received starting model
+    state Executing {
+        [*] --> Training
+        Training --> SecureAverageComputation : training step complete
+        SecureAverageComputation --> Training : model not complete
+        SecureAverageComputation --> [*] : model complete
+    }
+    Executing --> PendingReconnection : peer disconnected
+    Executing --> [*]
+    PendingReconnection --> Executing : peers reconnected
+    PendingReconnection --> Aborted : abort timer elapsed
+    Aborted --> Executing : peers reconnected
+    Aborted --> [*]
+

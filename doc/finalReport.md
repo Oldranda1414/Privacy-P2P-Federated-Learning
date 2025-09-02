@@ -1,3 +1,5 @@
+\newpage
+
 # Project Final Report Template
 
 <!-- copied this template: https://github.com/pikalab-unibo/sd-project-rules/blob/main/final-report-template.md -->
@@ -101,15 +103,21 @@ How should entities be modularised?
 (UML Component/Package/Deployment Diagrams)
 -->
 
-TODO Pinging????
+See [Figure 1](#figure1)
 
-![High Level Design](./assets/mermaid/hldesign.png)
+![High Level Design](./assets/mermaid/hldesign.png){#figure1}
 
 ### Behaviour
 
+<!--
 How should each entity behave?
 
 (UML State diagram or Activity Diagram)
+-->
+
+See [Figure 2](#figure2)
+
+![State Diagram](./assets/mermaid/state.png){#figure2}
 
 ### Interaction
 
@@ -184,8 +192,6 @@ Racap what you did __not__
 ### What I learned
 
 Racap what did you learn
-
-![example](./assets/mermaid/architecture.png)
 
 <!-- linked references -->
 
