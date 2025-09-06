@@ -134,7 +134,7 @@ This this case, the produced documentation should be referenced here.
 
 ## Self-assessment
 
-Choose a criterion for the evaluation of the produced software and __its compliance to the requirements above__.
+Choose a criterion for the evaluation of the produced software and **its compliance to the requirements above**.
 
 Pseudo-formal or formal criteria are preferred.
 
@@ -142,11 +142,11 @@ In case of a test-driven development, describe tests here and possibly report th
 
 ## Deployment Instructions
 
-The only project dependency necessary to run the simulations is (Docker)[https://www.docker.com/].
+The only project dependency necessary to run the simulations is [Docker](https://www.docker.com/).
 
-Unfortunately Docker's installation is not provided by Nix development environment functionalities, as it seems (there is currently no good mechanism for configuring services on non-NixOS hosts)[https://discourse.nixos.org/t/how-to-run-docker-daemon-from-nix-not-nixos/43413/2]. This means that docker must be installed 'manually'.
+Unfortunately Docker's installation is not provided by Nix development environment functionalities, as it seems [there is currently no good mechanism for configuring services on non-NixOS hosts](https://discourse.nixos.org/t/how-to-run-docker-daemon-from-nix-not-nixos/43413/2). This means that docker must be installed 'manually'.
 
-The easiest way to get Docker (and it's many products) installed is by installing (Docker Desktop)[https://docs.docker.com/desktop/].
+The easiest way to get Docker (and it's many products) installed is by installing [Docker Desktop](https://docs.docker.com/desktop/).
 
 ## Development Instructions
 
@@ -160,9 +160,9 @@ To enter the projects development environment, execute the following command whi
 nix develop
 ```
 
-Unfortunately Docker's installation is not provided by Nix development environment functionalities, as it seems (there is currently no good mechanism for configuring services on non-NixOS hosts)[https://discourse.nixos.org/t/how-to-run-docker-daemon-from-nix-not-nixos/43413/2]. This means that docker must be installed 'manually'.
+Unfortunately Docker's installation is not provided by Nix development environment functionalities, as it seems [there is currently no good mechanism for configuring services on non-NixOS hosts](https://discourse.nixos.org/t/how-to-run-docker-daemon-from-nix-not-nixos/43413/2). This means that docker must be installed 'manually'.
 
-The easiest way to get Docker (and it's many products) installed is by installing (Docker Desktop)[https://docs.docker.com/desktop/].
+The easiest way to get Docker (and it's many products) installed is by installing [Docker Desktop](https://docs.docker.com/desktop/).
 
 ## Usage Examples
 
@@ -187,7 +187,7 @@ Recap what you did
 
 ### Future works
 
-Racap what you did __not__
+Racap what you did **not**
 
 ### What I learned
 

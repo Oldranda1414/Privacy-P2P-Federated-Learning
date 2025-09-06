@@ -1,0 +1,14 @@
+services:
+  peer1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: peer1
+    command: ["--role", "ping", "--target", "peer2"]
+
+  peer2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: peer2
+    command: ["--role", "pong"]

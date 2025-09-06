@@ -15,3 +15,18 @@ doc:
     ./doc/bin/build_report.sh
     open ./doc/build/finalReport.pdf &
 
+# Run the p2p simulation
+[no-exit-message]
+run: down
+    docker compose -f docker/docker-compose.yml build
+    docker compose -f docker/docker-compose.yml up
+
+# Remove images the p2p simulation
+[no-exit-message]
+down:
+    docker compose -f docker/docker-compose.yml down
+
+# Add python module to project dependencies
+[no-exit-message]
+add *args:
+    uv --project app add {{args}}
