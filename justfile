@@ -17,14 +17,15 @@ doc:
 
 # Run the p2p simulation
 [no-exit-message]
-run: down
+run: clean
     docker compose -f docker/docker-compose.yml build
     docker compose -f docker/docker-compose.yml up
 
-# Remove images the p2p simulation
+# Clean docker images
 [no-exit-message]
-down:
+clean:
     docker compose -f docker/docker-compose.yml down
+    docker image prune -af
 
 # Add python module to project dependencies
 [no-exit-message]
