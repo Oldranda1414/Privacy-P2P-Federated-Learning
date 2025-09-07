@@ -30,4 +30,4 @@ clean:
 # Add python module to project dependencies
 [no-exit-message]
 add *args:
-    uv --project app add {{args}}
+    uv --project src add {{args}}
