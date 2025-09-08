@@ -1,34 +1,33 @@
 import asyncio
 import json
-import logging
-from typing import Awaitable, Callable, Dict, Any
 from datetime import datetime
+from typing import Awaitable, Callable, Dict
 
 # TODO undestand this better to document it in report
 
+from logger import get_logger
 from peers import Peer
+from communication.message import Message, MessageType
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_logger("com", "com - %(levelname)s - %(message)s")
 
 class AsyncCommunicator:
-    def __init__(self, peer: Peer, verbose: bool):
-        self.host = peer.host
-        self.port = peer.port
-        self.node_id = peer.node_id
+    def __init__(self, peer: Peer, verbose: bool = False):
+        # TODO find better name for this
+        self.peer = peer
         logger.disabled = not verbose
         self.server = None
-        self.connections: Dict[str, asyncio.StreamWriter] = {}
-        self.message_handlers: Dict[str, Callable[[str, str, str], Awaitable[None]]] = {}
+        self.connections: Dict[Peer, asyncio.StreamWriter] = {}
+        self.message_handlers: Dict[MessageType, Callable[[Peer, str, datetime], Awaitable[None]]] = {}
         self.running = False
         
     async def start_server(self):
         """Start the communication server"""
         self.server = await asyncio.start_server(
-            self._handle_client, self.host, self.port
+            self._handle_client, self.peer.host, self.peer.port
         )
         self.running = True
-        logger.info(f"Server started on {self.host}:{self.port}")
+        logger.info(f"Server started on {self.peer.host}:{self.peer.port}")
         
     async def stop_server(self):
         """Stop the communication server"""
@@ -42,20 +41,19 @@ class AsyncCommunicator:
         """Handle incoming client connections"""
         peer_addr = writer.get_extra_info('peername')
         logger.info(f"New connection from {peer_addr}")
-        
         try:
             while True:
                 data = await reader.readline()
                 if not data:
                     break
-                    
                 try:
-                    message = json.loads(data.decode().strip())
+                    message = Message.decode(data)
                     await self._process_message(message, writer)
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON received from {peer_addr}")
                     
         except asyncio.CancelledError:
+            logger.error("CancelledError")
             pass
         except Exception as e:
             logger.error(f"Error handling client {peer_addr}: {e}")
@@ -64,37 +62,25 @@ class AsyncCommunicator:
             await writer.wait_closed()
             logger.info(f"Connection closed for {peer_addr}")
             
-    async def _process_message(self, message: Dict[str, Any], writer: asyncio.StreamWriter):
+    async def _process_message(self, message: Message, writer: asyncio.StreamWriter):
         """Process incoming messages"""
-        msg_type = message.get('type')
-        sender = str(message.get('sender'))
-        content = str(message.get('content'))
-        timestamp = str(message.get('timestamp'))
         
-        logger.info(f"Received {msg_type} from {sender}: {content}")
-        
-        # Handle handshake messages to register connections
-        if msg_type == 'handshake':
-            self.connections[sender] = writer
-            response = {
-                'type': 'handshake_ack',
-                'sender': self.node_id,
-                'receiver': sender,
-                'content': 'Connected successfully',
-                'timestamp': datetime.now().isoformat()
-            }
+        logger.info(f"Received {message.message_type} from {message.sender.node_id}: {message.content}")
+
+        if message.message_type == MessageType.HANDSHAKE: # Handle handshake messages to register connections
+            self.connections[message.sender] = writer
+            response = Message(MessageType.HANDSHAKE_ACK, self.peer, message.sender, 'Connected successfully', datetime.now())
             await self._send_raw_message(writer, response)
-            
-        # Handle regular messages
-        elif msg_type == 'message':
-            if 'message' in self.message_handlers:
-                await self.message_handlers['message'](sender, content, timestamp)
+        elif message.message_type in self.message_handlers.keys():
+            await self.message_handlers[message.message_type](message.sender, message.content, message.timestamp)
+        else:
+            raise Exception(f"No handler registered for messege of type {message.message_type}")
                 
-    async def _send_raw_message(self, writer: asyncio.StreamWriter, message: Dict[str, Any]):
+    async def _send_raw_message(self, writer: asyncio.StreamWriter, message: Message):
         """Send raw message through a writer"""
         try:
-            data = json.dumps(message) + '\n'
-            writer.write(data.encode())
+            data = Message.encode(message)
+            writer.write(data)
             await writer.drain()
         except Exception as e:
             logger.error(f"Error sending message: {e}")
@@ -103,33 +89,24 @@ class AsyncCommunicator:
         """Connect to a peer node"""
         try:
             reader, writer = await asyncio.open_connection(peer.host, peer.port)
-            
-            # Send handshake
-            handshake = {
-                'type': 'handshake',
-                'sender': self.node_id,
-                'receiver': peer.node_id,
-                'content': f'Hello from {self.node_id}',
-                'timestamp': datetime.now().isoformat()
-            }
-            
+            handshake = Message(MessageType.HANDSHAKE, self.peer, peer, f'Hello from {self.peer.node_id}', datetime.now())
             await self._send_raw_message(writer, handshake)
             
             # Wait for handshake acknowledgment
             response_data = await reader.readline()
-            response = json.loads(response_data.decode().strip())
+            response = Message.decode(response_data)
             
-            if response.get('type') == 'handshake_ack':
-                self.connections[peer.node_id] = writer
+            if response.message_type == MessageType.HANDSHAKE_ACK:
+                self.connections[peer] = writer
                 logger.info(f"Successfully connected to {peer.node_id} at {peer.host}:{peer.port}")
-                
+
                 # Start listening for messages from this peer
-                asyncio.create_task(self._listen_to_peer(reader, writer, peer.node_id))
+                asyncio.create_task(self._listen_to_peer(reader, writer, peer))
                 
         except Exception as e:
             logger.error(f"Failed to connect to {peer.node_id} at {peer.host}:{peer.port}: {e}")
             
-    async def _listen_to_peer(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, peer_id: str):
+    async def _listen_to_peer(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, peer: Peer):
         """Listen for messages from a connected peer"""
         try:
             while True:
@@ -137,43 +114,36 @@ class AsyncCommunicator:
                 if not data:
                     break
                     
-                message = json.loads(data.decode().strip())
+                message = Message.decode(data)
                 await self._process_message(message, writer)
                 
         except Exception as e:
-            logger.error(f"Error listening to peer {peer_id}: {e}")
+            logger.error(f"Error listening to peer {peer.node_id}: {e}")
         finally:
-            if peer_id in self.connections:
-                del self.connections[peer_id]
+            if peer in self.connections:
+                del self.connections[peer]
                 
-    async def send_message(self, receiver: str, content: str):
+    async def send_message(self, receiver: Peer, message_type: MessageType, content: str):
         """Send a message to a specific receiver"""
         if receiver not in self.connections:
-            logger.error(f"No connection to {receiver}")
+            logger.error(f"No connection to {receiver.node_id}")
             return False
-            
-        message = {
-            'type': 'message',
-            'sender': self.node_id,
-            'receiver': receiver,
-            'content': content,
-            'timestamp': datetime.now().isoformat()
-        }
         
+        message = Message(message_type, self.peer, receiver, content, datetime.now())
         writer = self.connections[receiver]
         await self._send_raw_message(writer, message)
-        logger.info(f"Sent message to {receiver}: {content}")
+        logger.info(f"Sent message to {receiver.node_id}: {content}")
         return True
         
-    def register_message_handler(self, message_type: str, handler: Callable):
+    def register_message_handler(self, message_type: MessageType, handler: Callable):
         """Register a handler for incoming messages"""
         self.message_handlers[message_type] = handler
         
-    async def broadcast_message(self, content: str):
+    async def broadcast_message(self, message_type: MessageType, content: str):
         """Broadcast a message to all connected peers"""
         tasks = []
-        for receiver in self.connections.keys():
-            tasks.append(self.send_message(receiver, content))
+        for receiver in self.connections:
+            tasks.append(self.send_message(receiver, message_type, content))
         
         if tasks:
             await asyncio.gather(*tasks)

@@ -3,12 +3,46 @@ import os
 
 from environment import get_self_id
 from output import fprint
+from communication.encodable import Encodable
 
-class Peer:
+class Peer(Encodable):
     def __init__(self, node_id: str, host: str, port: int):
         self.node_id = node_id
         self.host = host
         self.port = port
+
+    def __hash__(self):
+        return hash((self.node_id, self.host, self.port))
+
+    def __eq__(self, other):
+        if not isinstance(other, Peer):
+            return False
+        return (self.node_id == other.node_id and 
+                self.host == other.host and 
+                self.port == other.port)
+
+    @classmethod
+    def to_dict(cls, obj: "Peer") -> dict:
+        return {
+            "node_id": obj.node_id,
+            "host": obj.host,
+            "port": obj.port,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Peer":
+        return cls(data["node_id"], data["host"], data["port"])
+
+    @classmethod
+    def encode(cls, obj: "Peer") -> bytes:
+        """Encode to JSON string."""
+        return json.dumps(cls.to_dict(obj)).encode()
+
+    @classmethod
+    def decode(cls, data: bytes) -> "Peer":
+        """Decode JSON string to instance."""
+        obj = json.loads(data.decode().strip())
+        return cls.from_dict(obj)
 
 def load_self(peers_file: str = "./peers.json") -> Peer:
     self_id = get_self_id()

@@ -1,62 +1,47 @@
 import asyncio
-from communication import AsyncCommunicator
 
-from peers import load_peers, load_self
+from peers import load_self, load_peers
+from communication.communicator import AsyncCommunicator
+from polling import PollingService
+from fsm import FSM
+
 from output import fprint
 
-comm: AsyncCommunicator | None = None
-RUN_TIMEOUT = 5
-
-async def example_message_handler(sender: str, content: str, timestamp: str):
-    """Example message handler"""
-    print(f"[{timestamp}] message from {sender}: {content}")
-    if comm:
-        if content == "ping":
-            await comm.send_message(sender, "pong")
-        if content == "pong":
-            await comm.send_message(sender, "ping")
+INTERVAL = 10
+TIMEOUT = 60
 
 async def main():
-
     global comm
+    self = load_self()
+    peers = load_peers()
 
-    try:
-        self = load_self()
-        peers = load_peers()
-    except Exception as e:
-        fprint(f"Error loading peers: {e}")
-        fprint(f"Shutting down...")
-        return
-
-    fprint(f"Starting {self.node_id}")
     comm = AsyncCommunicator(self, False)
-    
-    # Register message handler
-    comm.register_message_handler('message', example_message_handler)
-    
-    # Start server
     await comm.start_server()
 
-    # Add a small delay to ensure all peers are ready
-    await asyncio.sleep(10)
-
-    # Connect to other peers
+    # Connect to peers
     for peer in peers.values():
-        fprint(f"Attempting to connect to {peer.node_id} at {peer.host}:{peer.port}")
         await comm.connect_to_peer(peer)
-        await asyncio.sleep(1)  # Give connection time to establish
 
-    if self.node_id == "node1":
-        for peer in peers.values():
-            await comm.send_message(peer.node_id, "ping")
+    # Create FSM
+    fsm = FSM(comm, peers, 3)
+
+    # Shutdown callback
+    async def shutdown():
+        await comm.stop_server()
+        fprint(f"Node {self.node_id} shutting down due to peer failure")
+        asyncio.get_event_loop().stop()
+
+    # Create poller
+    poller = PollingService(comm, peers, shutdown, INTERVAL, TIMEOUT, False)
+
+    asyncio.create_task(fsm.run())
+    asyncio.create_task(poller.run())
+    print("finished setup, running indefenetly")
 
     try:
-        await asyncio.wait_for(asyncio.Future(), timeout=RUN_TIMEOUT)
-    except asyncio.TimeoutError:
-        fprint("Timeout reached, shutting down...")
-    finally:
-        await comm.stop_server()
-        fprint(f"Ending {self.node_id}")
+        await asyncio.Future()  # keep running until stopped
+    except asyncio.CancelledError:
+        pass
 
 if __name__ == "__main__":
     asyncio.run(main())
