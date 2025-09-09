@@ -29,5 +29,11 @@ clean:
 
 # Add python module to project dependencies
 [no-exit-message]
-add *args:
-    uv --project src add {{args}}
+add *modules:
+    uv --project src add {{modules}}
+
+# Remove python module from project dependencies
+[no-exit-message]
+remove *modules:
+    uv --project src remove {{modules}}
+
