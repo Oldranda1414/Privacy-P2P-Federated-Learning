@@ -1,0 +1,175 @@
+---
+config:
+  class:
+    hideEmptyMembersBox: true
+  layout: elk
+---
+classDiagram
+    class main {
+        main()
+    }
+    main ..> asyncio
+    main ..> peers
+    main ..> AsyncCommunicator
+    main ..> PollingService
+    main ..> FiniteStateMachine
+    main ..> logger
+
+    class logger {
+        get_logger(name: str, fmt: str) -> Logger
+    }
+    logger ..> logging
+
+    class environment {
+        get_self_id() -> str
+    }
+    environment ..> os
+
+    %% polling.py
+    class PollingService {
+        \_\_init\_\_(comm, peers, shutdown_cb, interval, timeout, verbose)
+        run()
+    }
+    PollingService ..> asyncio
+    PollingService ..> datetime
+    PollingService ..> AsyncCommunicator
+    PollingService ..> MessageType
+    PollingService ..> Peer
+    PollingService ..> logger
+
+    %% fsm.py
+    class FiniteStateMachine {
+        \_\_init\_\_(comm: AsyncCommunicator, peers: dict[str, Peer], rounds: int)
+        run()
+        shutdown()
+    }
+    FiniteStateMachine ..> asyncio
+    FiniteStateMachine ..> random
+    FiniteStateMachine ..> logger
+    FiniteStateMachine ..> AsyncCommunicator
+    FiniteStateMachine ..> MessageType
+    FiniteStateMachine ..> Peer
+
+    %% communication/
+
+    %%% message.py
+    class MessageType {
+        HANDSHAKE
+        POLLING
+        FSM
+    }
+    <<enum>> MessageType
+    MessageType <|-- Enum
+
+    class Message {
+        \_\_init\_\_(message_type, sender, receiver, content, timestamp)
+
+        to_dict(obj: Message) -> dict
+        from_dict(data: dict) -> Message
+        encode(obj: Message) -> bytes
+        decode(data: bytes) -> Peer
+    }
+    Message <|-- Encodable
+    Message ..> datetime
+    Message ..> json
+    Message ..> Peer
+    Message ..> MessageType
+
+    %%% communicator.py
+    class AsyncCommunicator {
+        \_\_init\_\_(peer: Peer, verbose: bool = False)
+        start_server()
+        stop_server()
+        connect_to_peer(peer: Peer)
+        send_message(receiver, message_type, content)
+        register_message_handler(message_type, handler)
+        broadcast_message(message_type, content)
+    }
+    AsyncCommunicator ..> asyncio
+    AsyncCommunicator ..> datetime
+    AsyncCommunicator ..> logger
+    AsyncCommunicator ..> Peer
+    AsyncCommunicator ..> Message
+    AsyncCommunicator ..> MessageType
+
+    %%% encodable.py
+    class Encodable {
+        to_dict(obj: Encodable) -> dict
+        from_dict(data: dict) -> Encodable
+        encode(obj: Encodable) -> bytes
+        decode(data: bytes) -> Encodable
+    }
+    <<abstract>> Encodable
+    Encodable <|-- ABC
+
+    %% peers.py
+    class peers {
+        load_self(peers_file: str) -> Peer
+        load_peers(peers_file: str) -> dict[str, Peer]
+    }
+    peers ..> Peer
+    peers ..> environment
+    peers ..> os
+    peers ..> json
+
+    class Peer {
+        \_\_init\_\_(node_id: str, host: str, port: int)
+        \_\_hash\_\_()
+        \_\_eq\_\_(other: Peer)
+
+        to_dict(obj: Peer) -> dict
+        from_dict(data: dict) -> Peer
+        encode(obj: Peer) -> bytes
+        decode(data: bytes) -> Peer
+    }
+    Peer <|-- Encodable
+    Peer ..> json
+
+    %% builtins
+    class os:::builtin
+    <<builtin>> os
+    class asyncio:::builtin
+    <<builtin>> asyncio
+    class logging:::builtin
+    <<builtin>> logging
+    class json:::builtin
+    <<builtin>> json
+    class ABC:::builtin
+    <<builtin>> ABC
+    class datetime:::builtin
+    <<builtin>> datetime
+    class Enum:::builtin
+    <<builtin>> Enum
+    class random:::builtin
+    <<builtin>> random
+
+    %% external dependencies
+
+    %% example
+    %% class docopt:::extern
+    %% <<extern>> docopt
+
+    %% legend
+
+    class Builtin:::builtin
+    %% class Extern:::extern
+    %% class peers:::peers
+    %% class Output:::serviceOutput
+    %% class Check:::serviceCheck
+    %% class Error:::error
+    %% class LLM:::llm
+    %% class Utils:::utils
+    %% class FileSystem:::file_system
+
+    %% style
+
+    classDef builtin fill:#BBDEFB,stroke:#1565C0,stroke-width:1px
+    %% classDef extern fill:#C8E6C9,stroke:#2E7D32,stroke-width:1px
+    %% classDef peers fill:#FFE0B2,stroke:#EF6C00,stroke-width:1px
+    %% classDef serviceOutput fill:#FFECB3,stroke:#FF9800,stroke-width:1px
+    %% classDef serviceCheck fill:#FFF3E0,stroke:#FFB74D,stroke-width:1px
+    %% classDef error fill:#FFCDD2,stroke:#C62828,stroke-width:1px
+    %% classDef llm fill:#E1BEE7,stroke:#6A1B9A,stroke-width:1px
+    %% classDef utils fill:#E0E0E0,stroke:#424242,stroke-width:1px
+    %% classDef file_system fill:#B2DFDB,stroke:#00796B,stroke-width:1px
+
