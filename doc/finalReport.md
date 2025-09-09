@@ -107,6 +107,11 @@ See [Figure 1](#figure1)
 
 ![High Level Design](./assets/mermaid/hldesign.png){#figure1}
 
+See [Figure 2](#figure2), some typings have been removed from longer method signatures for rappresentational purpose.
+
+![Full Class Diagram](./assets/mermaid/classfull.png){#figure2}
+
+
 ### Behaviour
 
 <!--
@@ -115,9 +120,9 @@ How should each entity behave?
 (UML State diagram or Activity Diagram)
 -->
 
-See [Figure 2](#figure2)
+See [Figure 3](#figure3)
 
-![State Diagram](./assets/mermaid/state.png){#figure2}
+![State Diagram](./assets/mermaid/state.png){#figure3}
 
 ### Interaction
 
@@ -127,10 +132,41 @@ How should entities interact with each other?
 
 ## Implementation Details
 
+<!--
 Just report interesting / non-trivial / non-obvious implementation details.
 
 This section is expected to be short in case some documentation (e.g. Javadoc or Swagger Spec) has been produced for the software artifacts.
 This this case, the produced documentation should be referenced here.
+-->
+
+TODO generate doc?
+
+### Message type implementation
+
+The need for a 'message type' arose when designing the communication system. Messages must be typed so that different handlers can be defined for different message types, helping with separation of concerns, as modules are usually able to define handlers only for some, usually only one, message type.
+
+Various solutions where considered for the implementation of the 'message type'.
+
+The easiest solution is to use a simple string. This was quickly discarded as using strings would be too error proned, as typos would be hard do debug.
+
+A simple solution is to use an enumeration, as follows:
+
+```py
+class MessageType(str, Enum):
+    EXAMPLE_TYPE1 = "exampletype1"
+    EXAMPLE_TYPE2 = "exampletype2"
+    EXAMPLE_TYPE3 = "exampletype3"
+
+# usage
+
+message = Message(MessageType.EXAMPLE_TYPE1, contents)
+```
+
+Although this solution is typo resistant, it forces all types to be defined in a single file, centralizing the definition. Also any module that creates messages would have to import the entire enum, even though it would probably only a limited number of it's cases. Still, this solution has the advantage of a very easy and straightforward usage and serialization/deserialization (by inheriting from `str`).
+
+Another solution considered was an abstract class 'MessageType' that would be extended by empty concrete classes, replacing the Enum members, defined by the modules that would use them. This solution provides good separation of concerns and follows the open/closed principle, but it loses straightforward usage and usage and serialization/deserialization.
+
+Given the project's small scope and prototyping nature, the 'Enum' solution has been implemented, preferring simplicity over advanced software principles.
 
 ## Self-assessment
 

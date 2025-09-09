@@ -34,7 +34,7 @@ for FILE in "$SRC_FOLDER"/*.mmd; do
 done
 
 # augment scale for big diagrams
-BASENAME="full_diag"
+BASENAME="fullclass"
 FILE="$SRC_FOLDER/$BASENAME.mmd"
 
 if [[ -f "$FILE" ]]; then
