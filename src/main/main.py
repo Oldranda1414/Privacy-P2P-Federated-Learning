@@ -3,17 +3,20 @@ import asyncio
 from peers import load_self, load_peers
 from communication.communicator import AsyncCommunicator
 from polling import PollingService
-from fsm import FSM
+from fsm import FiniteStateMachine
 
-from output import fprint
+from logger import get_logger
+
+logger = get_logger("main", "main - %(levelname)s - %(message)s")
 
 INTERVAL = 10
 TIMEOUT = 60
+PEER_JSON_FILE = "peers.json"
 
 async def main():
     global comm
-    self = load_self()
-    peers = load_peers()
+    self = load_self(PEER_JSON_FILE)
+    peers = load_peers(PEER_JSON_FILE)
 
     comm = AsyncCommunicator(self, False)
     await comm.start_server()
@@ -22,13 +25,13 @@ async def main():
     for peer in peers.values():
         await comm.connect_to_peer(peer)
 
-    # Create FSM
-    fsm = FSM(comm, peers, 3)
+    # Create fsm
+    fsm = FiniteStateMachine(comm, peers, 3)
 
     # Shutdown callback
     async def shutdown():
         await comm.stop_server()
-        fprint(f"Node {self.node_id} shutting down due to peer failure")
+        logger.info(f"Node {self.node_id} shutting down due to peer failure")
         asyncio.get_event_loop().stop()
 
     # Create poller
@@ -36,7 +39,7 @@ async def main():
 
     asyncio.create_task(fsm.run())
     asyncio.create_task(poller.run())
-    print("finished setup, running indefenetly")
+    logger.info("finished setup, running indefenetly")
 
     try:
         await asyncio.Future()  # keep running until stopped

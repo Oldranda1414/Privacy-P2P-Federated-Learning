@@ -1,13 +1,14 @@
 from enum import Enum
-from peers import Peer
 from datetime import datetime
 import json
 
+from peers import Peer
 from communication.encodable import Encodable
 from logger import get_logger
 
 logger = get_logger("mess", "mess - %(levelname)s - %(message)s")
 
+# TODO remove the HANDSHAKE_ACK type and use contents to distinguish
 class MessageType(str, Enum):
     HANDSHAKE = "handshake"
     HANDSHAKE_ACK = "handshakeack"
@@ -24,48 +25,32 @@ class Message(Encodable):
 
     @classmethod
     def to_dict(cls, obj: "Message") -> dict:
-        try:
-            return {
-                "type": obj.message_type,
-                "sender": Peer.to_dict(obj.sender),
-                "receiver": Peer.to_dict(obj.receiver),
-                "content": obj.content,
-                "timestamp": obj.timestamp.isoformat(),
-            }
-        except Exception as e:
-            logger.error(f"error occurred in to_dict: {e}")
-            return {}
+        return {
+            "type": obj.message_type,
+            "sender": Peer.to_dict(obj.sender),
+            "receiver": Peer.to_dict(obj.receiver),
+            "content": obj.content,
+            "timestamp": obj.timestamp.isoformat(),
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> "Message":
-        try:
-            message_type = data["type"]
-            sender = Peer.from_dict(data["sender"])
-            receiver = Peer.from_dict(data["receiver"])
-            content = data["content"]
-            timestamp = datetime.fromisoformat(data["timestamp"])
-            msg = cls(message_type, sender, receiver, content, timestamp)
-            return msg
-        except Exception as e:
-            logger.error(f"error occurred in from_dict: {e}")
-            raise e
+        message_type = data["type"]
+        sender = Peer.from_dict(data["sender"])
+        receiver = Peer.from_dict(data["receiver"])
+        content = data["content"]
+        timestamp = datetime.fromisoformat(data["timestamp"])
+        msg = cls(message_type, sender, receiver, content, timestamp)
+        return msg
 
     @classmethod
     def encode(cls, obj: "Message") -> bytes:
         """Encode to JSON string."""
-        try:
-            return (json.dumps(cls.to_dict(obj)) + "\n").encode()
-        except Exception as e:
-            logger.error(f"error occurred in encode: {e}")
-            return bytes()
+        return (json.dumps(cls.to_dict(obj)) + "\n").encode()
 
     @classmethod
     def decode(cls, data: bytes) -> "Message":
         """Decode JSON string to instance."""
-        try:
-            obj = json.loads(data.decode().strip())
-            return cls.from_dict(obj)
-        except Exception as e:
-            logger.error(f"error occurred in decode: {e}")
-            raise e
+        obj = json.loads(data.decode().strip())
+        return cls.from_dict(obj)
 

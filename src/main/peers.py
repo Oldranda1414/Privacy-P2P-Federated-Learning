@@ -2,7 +2,6 @@ import json
 import os
 
 from environment import get_self_id
-from output import fprint
 from communication.encodable import Encodable
 
 class Peer(Encodable):
@@ -44,12 +43,12 @@ class Peer(Encodable):
         obj = json.loads(data.decode().strip())
         return cls.from_dict(obj)
 
-def load_self(peers_file: str = "./peers.json") -> Peer:
+def load_self(peers_file: str) -> Peer:
     self_id = get_self_id()
     peers = _load_peer_file(peers_file)
     return peers.pop(self_id)
 
-def load_peers(peers_file: str = "peers.json") -> dict[str, Peer]:
+def load_peers(peers_file: str) -> dict[str, Peer]:
     self_id = get_self_id()
     peers = _load_peer_file(peers_file)
     peers.pop(self_id)
@@ -64,6 +63,5 @@ def _load_peer_file(path: str) -> dict[str, Peer]:
         data = json.load(f)
     
     raw_peers = data.get('peers', [])
-    fprint(f"Loaded {len(raw_peers)})")
     return {peer['node_id']: Peer(peer['node_id'], peer['host'], int(peer['port'])) for peer in raw_peers}
 
