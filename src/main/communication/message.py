@@ -6,14 +6,14 @@ from peers import Peer
 from communication.encodable import Encodable
 from logger import get_logger
 
-logger = get_logger("mess", "mess - %(levelname)s - %(message)s")
+logger = get_logger("mess")
 
 # TODO remove the HANDSHAKE_ACK type and use contents to distinguish
 # TODO what about replacing with abc and having all other modules define a class extending this defining their own stuff?
 class MessageType(str, Enum):
     HANDSHAKE = "handshake"
     HANDSHAKE_ACK = "handshakeack"
-    POLLING = "polling"
+    HEARTBEAT = "heartbeat"
     FSM = "fsm"
 
 class Message(Encodable):

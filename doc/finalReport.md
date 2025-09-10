@@ -231,7 +231,7 @@ Racap what you did **not**
 
 #### Unit tests and CI
 
-Before any additonal work would be done on the project, a unit test and consequent CI infrastructure would have to be instantiated, as the project exceedes it's proof of concept goal on it's way to becoming a production ready project.
+Before any additonal work would be done on the project, a unit test and consequent CI infrastructure would have to be instantiated, as the project exceedes it's proof of concept goal on it's way to becoming a production ready artifact.
 
 #### Python Package
 
@@ -254,6 +254,8 @@ Still an algorithm for a leader election might improve the algorithms generality
 The current implementation of the heartbeat pattern is very rudimentary.
 
 A more advanced version could implement a gossip-based heartbeat to limit the number of messages sent through network and to improve the scaling capabilities of the algorithm.
+
+Also the current pulse message contains a dummy string (`"I'm alive!"`). The message could be improved to containing usefull information, such as surrent finite state machine status or uptime.
 
 #### Dinamic members and recovery
 
