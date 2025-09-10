@@ -144,3 +144,6 @@ class AsyncCommunicator:
             await asyncio.gather(*tasks)
             logger.info(f"Broadcasted message to {len(tasks)} peers: {content}")
 
+    def get_connected_peers(self) -> set[Peer]:
+        return set(self.connections.keys())
+

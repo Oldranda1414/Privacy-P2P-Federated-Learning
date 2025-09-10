@@ -13,10 +13,9 @@ stateDiagram-v2
         SecureAverageComputation --> Training : model not complete
         SecureAverageComputation --> [*] : model complete
     }
-    Executing --> PendingReconnection : peer disconnected
-    Executing --> [*]
-    PendingReconnection --> Executing : peers reconnected
-    PendingReconnection --> Aborted : abort timer elapsed
-    Aborted --> Executing : peers reconnected
-    Aborted --> [*]
+    Executing --> Aborting : peer failure detected
+    Executing --> SavingModel : execution completed
+    SavingModel --> [*] : model saved
+    Aborting --> [*]
+    Shutdown --> [*]
 

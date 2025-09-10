@@ -20,6 +20,9 @@ class Peer(Encodable):
                 self.host == other.host and 
                 self.port == other.port)
 
+    def __str__(self):
+        return f"{self.node_id}({self.host}, {self.port})"
+
     @classmethod
     def to_dict(cls, obj: "Peer") -> dict:
         return {

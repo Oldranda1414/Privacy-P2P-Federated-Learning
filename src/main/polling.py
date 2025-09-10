@@ -10,6 +10,7 @@ from logger import get_logger
 logger = get_logger("poll", "poll - %(levelname)s - %(message)s")
 
 # TODO change polling to heartbeat if deemed better
+# TODO check if the interval and timeouts are respected (I'm afraid not atm)
 
 class PollingService:
     def __init__(self, comm: AsyncCommunicator, peers: dict[str, Peer], shutdown_cb: Callable[[], Awaitable[None]], interval: float, timeout: float, verbose:bool = False):

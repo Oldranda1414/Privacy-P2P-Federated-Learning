@@ -219,15 +219,31 @@ Ideally, there should be at least one example for each scenario proposed above.
 
 ## Conclusion
 
+<!-- INSTRUCTIONS
 Recap what you did
+-->
 
 ### Future works
 
+<!-- INSTRUCTIONS
 Racap what you did **not**
+-->
+
+#### Leader election
+
+In the first part of the algorithm execution the peers must elect a 'leader' that generates the model's starting weights and passes then to the other peers, to ensure all peers start the first training round using the same model.
+
+In this project the peer named "Peer1" is always selected as this temprorary leader. The protocol could be improved by using an election mechanism to remove the necessity to select the peer to cover this role beforehand.
+
+It could be argued that the ML model architecture is also something the peers should agree on through the algorithm, but immagining diverce companies collaborating through SAC some preliminary meetings would probably have the responsability of deciding the model's architecture, and possibly the startging model weights, so in a practical application these problems would not arise.
+
+Still an algorithm for a leader election might improve the algorithms generality.
 
 ### What I learned
 
+<!-- INSTRUCTIONS
 Racap what did you learn
+-->
 
 <!-- linked references -->
 
