@@ -229,6 +229,16 @@ Recap what you did
 Racap what you did **not**
 -->
 
+#### Unit tests and CI
+
+Before any additonal work would be done on the project, a unit test and consequent CI infrastructure would have to be instantiated, as the project exceedes it's proof of concept goal on it's way to becoming a production ready project.
+
+#### Python Package
+
+A non trivial resetructure of the high level implementations of the project could be done to turn the project into a python package. This would entail the use of a simple and understandable API to empower users to quickly setup peers and have them start the distributed algorithm.
+
+Although a costly improvement it would make the adoption of the project much easier for the users.
+
 #### Leader election
 
 In the first part of the algorithm execution the peers must elect a 'leader' that generates the model's starting weights and passes then to the other peers, to ensure all peers start the first training round using the same model.
@@ -238,6 +248,18 @@ In this project the peer named "Peer1" is always selected as this temprorary lea
 It could be argued that the ML model architecture is also something the peers should agree on through the algorithm, but immagining diverce companies collaborating through SAC some preliminary meetings would probably have the responsability of deciding the model's architecture, and possibly the startging model weights, so in a practical application these problems would not arise.
 
 Still an algorithm for a leader election might improve the algorithms generality.
+
+#### Improved heartbeat system
+
+The current implementation of the heartbeat pattern is very rudimentary.
+
+A more advanced version could implement a gossip-based heartbeat to limit the number of messages sent through network and to improve the scaling capabilities of the algorithm.
+
+#### Dinamic members and recovery
+
+The current implementation implies knowledge on the number of peers involved and their info (as in port and host) in advance. Also it does not implement any recovery plans for temporary failed peers neither does it provide a way to add a peer to an already started run of the algorithm.
+
+Distributed system design could be imployed to provide these desirable functionalities, allowing the project prototype to be closer to production ready code.
 
 ### What I learned
 
