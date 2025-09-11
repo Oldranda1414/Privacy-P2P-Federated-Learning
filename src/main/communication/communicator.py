@@ -10,8 +10,9 @@ from communication.message import Message, MessageType
 
 
 class AsyncCommunicator:
-    def __init__(self, owner: Peer, quiet: bool = True):
+    def __init__(self, owner: Peer, connection_timeout: int, quiet: bool = True):
         self.owner = owner
+        self.connection_timeout = connection_timeout
         self.server = None
         self.connections: Dict[Peer, asyncio.StreamWriter] = {}
         self.message_handlers: Dict[MessageType, Callable[[Peer, str, datetime], Awaitable[None]]] = {}
@@ -81,26 +82,50 @@ class AsyncCommunicator:
         except Exception as e:
             self.log.error(f"Error sending message: {e}")
             
-    async def connect_to_peer(self, peer: Peer):
+    async def connect_to_peer(self, peer: Peer) -> bool:
         """Connect to a peer node"""
         try:
             reader, writer = await asyncio.open_connection(peer.host, peer.port)
-            handshake = Message(MessageType.HANDSHAKE, self.owner, peer, f'Hello from {self.owner.node_id}', datetime.now())
+            handshake = Message(
+                MessageType.HANDSHAKE,
+                self.owner,
+                peer,
+                f'Hello from {self.owner.node_id}',
+                datetime.now()
+            )
             await self._send_raw_message(writer, handshake)
-            
-            # Wait for handshake acknowledgment
-            response_data = await reader.readline()
+
+            try:
+                response_data = await asyncio.wait_for(reader.readline(), timeout=self.connection_timeout)
+            except asyncio.TimeoutError:
+                self.log.error(f"Timeout of {self.connection_timeout} seconds waiting for handshake from {peer.node_id}")
+                writer.close()
+                await writer.wait_closed()
+                return False
+
+            if not response_data:  # connection closed without reply
+                self.log.error(f"No handshake response from {peer.node_id}")
+                writer.close()
+                await writer.wait_closed()
+                return False
+
             response = Message.decode(response_data)
-            
+
             if response.message_type == MessageType.HANDSHAKE_ACK:
                 self.connections[peer] = writer
                 self.log.info(f"Successfully connected to {peer.node_id} at {peer.host}:{peer.port}")
 
                 # Start listening for messages from this peer
                 asyncio.create_task(self._listen_to_peer(reader, writer, peer))
-                
+                return True
+
+            self.log.error(f"Unexpected handshake response from {peer.node_id}: {response.message_type}")
+            writer.close()
+            await writer.wait_closed()
+            return False
         except Exception as e:
             self.log.error(f"Failed to connect to {peer.node_id} at {peer.host}:{peer.port}: {e}")
+            return False
             
     async def _listen_to_peer(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, peer: Peer):
         """Listen for messages from a connected peer"""

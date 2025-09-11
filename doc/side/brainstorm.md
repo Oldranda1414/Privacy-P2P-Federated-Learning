@@ -161,6 +161,6 @@ TODO define the type of the comunication model chosen for the project:
 - docker python ping pong (with configurable number of peers) DONE
 - fsm with background polling (not sure this is the best solution, think about this) DONE
 - data load, marshall and unmarshall
-- SAC with dummy data (checkout how to do sync with p2p)
+- SAC with dummy data
 - ai
 

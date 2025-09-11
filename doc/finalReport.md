@@ -150,6 +150,54 @@ The following simplifications have been made to the states for ease of implement
 - the 'Executing' super-state was not implemented, using it's substates 'Training' and 'SecureAverageComputation' directly instead.
 - the 'SavingModel' and 'SavingPartialModel' states where fused in a single 'SavingModel' state as the implementation of each had no significant difference.
 
+### Closures for fsm state handlers
+
+Defining all of the finite state machine implementation in a single file would create a massive file, unideal for maintenence and debugging.
+
+The execution logic behind every state is encapsulated in functions that return the new state the fsm would be in. Ideally these 'handlers' should be implemented in separate files. But handlers must access the context of the fsm so a classic function would not be sufficient.
+
+The solution is to use higher order functions and closures. Handler defining modules provide a method that takes a context and returns a handler that has the context captured. The following is a simplified example:
+
+```py
+from typing import Callable, Awaitable
+
+from fsm.state import State
+from fsm.context import Context
+
+def get_handler(context: Context) -> Callable[[], Awaitable[State]]:
+    async def handler() -> State:
+        # execute logic
+        return State.NEWSTATE
+    return waiting_handler
+
+# simplified fsm loop implementation
+async def loop(self):
+    while True:
+        handler = self.handlers[self.context.state]
+        self.context.state = await handler()
+```
+
+Another way to implement this is to modify the loop function of the fsm to always execute the state handler passing the context:
+
+```py
+from fsm.state import State
+from fsm.context import Context
+
+async def handler(context: Context) -> State:
+    # execute logic
+    return State.NEWSTATE
+
+# simplified fsm loop implementation
+async def loop(self):
+    while True:
+        handler = self.handlers[self.context.state]
+        self.context.state = await handler(self.context)
+```
+
+The closure solution was choosen because deemed more elegant and readable.
+
+This also works well when defining 'message handlers' alongside fsm state handlers in the same module, coupling code responsible for the same beheviour. A good example of this is located at `src/main/fsm/handler/waiting.py`
+
 ### Message type
 
 The need for a 'message type' arose when designing the communication system. Messages must be typed so that different handlers can be defined for different message types, helping with separation of concerns, as modules are usually able to define handlers only for some, usually only one, message type.
