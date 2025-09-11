@@ -152,6 +152,8 @@ The following simplifications have been made to the states for ease of implement
 
 ### Closures for fsm state handlers
 
+<!-- TODO check if the closure terminology is correct -->
+
 Defining all of the finite state machine implementation in a single file would create a massive file, unideal for maintenence and debugging.
 
 The execution logic behind every state is encapsulated in functions that return the new state the fsm would be in. Ideally these 'handlers' should be implemented in separate files. But handlers must access the context of the fsm so a classic function would not be sufficient.
