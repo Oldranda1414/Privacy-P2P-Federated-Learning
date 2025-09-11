@@ -141,7 +141,16 @@ This this case, the produced documentation should be referenced here.
 
 TODO generate doc?
 
-### Message type implementation
+### FiniteStateMachine
+
+A simple `FiniteStateMachine` class is used to implement the beheviour showed in [Figure 3](#figure3).
+
+The following simplifications have been made to the states for ease of implementation:
+
+- the 'Executing' super-state was not implemented, using it's substates 'Training' and 'SecureAverageComputation' directly instead.
+- the 'SavingModel' and 'SavingPartialModel' states where fused in a single 'SavingModel' state as the implementation of each had no significant difference.
+
+### Message type
 
 The need for a 'message type' arose when designing the communication system. Messages must be typed so that different handlers can be defined for different message types, helping with separation of concerns, as modules are usually able to define handlers only for some, usually only one, message type.
 

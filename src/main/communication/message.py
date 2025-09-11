@@ -14,7 +14,7 @@ class MessageType(str, Enum):
     HANDSHAKE = "handshake"
     HANDSHAKE_ACK = "handshakeack"
     HEARTBEAT = "heartbeat"
-    FSM = "fsm"
+    SYNC = "sync"
 
 class Message(Encodable):
     def __init__(self, message_type: MessageType, sender: Peer, receiver: Peer, content: str, timestamp: datetime):

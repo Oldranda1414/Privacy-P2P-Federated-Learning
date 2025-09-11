@@ -4,18 +4,20 @@ config:
   look: classic
 ---
 stateDiagram-v2
-    [*] --> Setup
-
-    Setup --> Executing : connected to peers / received starting model
+    [*] --> Connecting
+    Connecting --> Setup : Connected to peers
+    Connecting --> Shutdown : Unable to connect to peers
+    Setup --> Executing : sent/received starting model
     state Executing {
         [*] --> Training
-        Training --> SecureAverageComputation : training step complete
+        Training --> WaitingForPeers : training step complete
+        WaitingForPeers --> SecureAverageComputation : all peers ready for SAC
         SecureAverageComputation --> Training : model not complete
         SecureAverageComputation --> [*] : model complete
     }
-    Executing --> Aborting : peer failure detected
+    Executing --> SavingPartialModel : peer failure detected
     Executing --> SavingModel : execution completed
-    SavingModel --> [*] : model saved
-    Aborting --> [*]
+    SavingModel --> Shutdown : model saved
+    SavingPartialModel --> Shutdown : partial model saved
     Shutdown --> [*]
 
