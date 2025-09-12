@@ -227,6 +227,12 @@ Another solution considered was an abstract class 'MessageType' that would be ex
 
 Given the project's small scope and prototyping nature, the 'Enum' solution has been implemented, preferring simplicity over advanced software principles.
 
+### Model weights
+
+Machine learning model weights are implemented as a wrapper class. Since weights implementation might vary greatly based on the machine learning library used, the usage of a wrapper class ensures that replacing the machine learning library should be an easy operation.
+
+Having the weights wrapper class implemement a collection of single 'Weight' objects was considered, but due to the non trivial implementation of weights (e.g. in keras the weights are provided as a list of numpy arrays, two for each layer, separating weights and biases in different arrays) in machine learning libraries a full wrapper class ensures minimal code rewriting when changing ML library.
+
 ## Self-assessment
 
 Choose a criterion for the evaluation of the produced software and **its compliance to the requirements above**.
