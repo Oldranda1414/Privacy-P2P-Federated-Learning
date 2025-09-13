@@ -6,7 +6,9 @@ from typing import Awaitable, Callable, Dict
 
 from logger import get_logger
 from peers import Peer
+
 from communication.message import Message, MessageType
+from communication.encodable import Encodable
 
 
 class AsyncCommunicator:
@@ -15,7 +17,7 @@ class AsyncCommunicator:
         self.connection_timeout = connection_timeout
         self.server = None
         self.connections: Dict[Peer, asyncio.StreamWriter] = {}
-        self.message_handlers: Dict[MessageType, Callable[[Peer, str, datetime], Awaitable[None]]] = {}
+        self.message_handlers: Dict[MessageType, Callable[[Peer, str | Encodable, datetime], Awaitable[None]]] = {}
         self.running = False
 
         self.log = get_logger("com")
@@ -144,7 +146,7 @@ class AsyncCommunicator:
             if peer in self.connections:
                 del self.connections[peer]
                 
-    async def send_message(self, receiver: Peer, message_type: MessageType, content: str):
+    async def send_message(self, receiver: Peer, message_type: MessageType, content: str | Encodable):
         """Send a message to a specific receiver"""
         if receiver not in self.connections:
             self.log.error(f"No connection to {receiver.node_id}")
@@ -160,7 +162,7 @@ class AsyncCommunicator:
         """Register a handler for incoming messages"""
         self.message_handlers[message_type] = handler
         
-    async def broadcast_message(self, message_type: MessageType, content: str):
+    async def broadcast_message(self, message_type: MessageType, content: str | Encodable):
         """Broadcast a message to all connected peers"""
         tasks = []
         for receiver in self.connections:

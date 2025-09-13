@@ -275,6 +275,12 @@ To see available commands:
 just
 ```
 
+<!-- 
+TODO create a command that takes the number of peers and executes the simulations
+
+use python to generate the docker-compose with n peers, use sh script to list operations easily I guess
+-->
+
 <!-- TODO complete this -->
 
 <!-- INSTRUCTIONS

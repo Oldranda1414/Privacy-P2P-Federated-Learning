@@ -10,7 +10,7 @@ async def main():
     log = get_logger("main")
 
     # Create fsm
-    fsm = FiniteStateMachine((not get_self_id() == "node1"))
+    fsm = FiniteStateMachine((not get_self_id() == "node2"))
     fsm_task = asyncio.create_task(fsm.run())
 
     try:

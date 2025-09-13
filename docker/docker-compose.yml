@@ -8,6 +8,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: peer1
+    volumes:
+      - ./output/peer1:/app/output
 
   peer2:
     ports:
@@ -18,6 +20,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: peer2
+    volumes:
+      - ./output/peer2:/app/output
 
   peer3:
     ports:
@@ -28,3 +32,5 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: peer3
+    volumes:
+      - ./output/peer3:/app/output

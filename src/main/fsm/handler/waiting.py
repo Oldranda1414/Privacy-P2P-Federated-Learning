@@ -8,7 +8,7 @@ from communication.message import MessageType
 from peers import Peer
 
 def get_waiting_handler(context: Context) -> Callable[[], Awaitable[State]]:
-    context.comm.register_message_handler(MessageType.SYNC, get_message_handler(context))
+    context.comm.register_message_handler(MessageType.SYNC, _get_message_handler(context))
     async def waiting_handler() -> State:
         await context.comm.broadcast_message(MessageType.SYNC, "I am done!")
         while len(context.sync_peers) < len(context.peers):
@@ -18,7 +18,7 @@ def get_waiting_handler(context: Context) -> Callable[[], Awaitable[State]]:
         return State.SECURE_AVERAGE_COMPUTATION
     return waiting_handler
 
-def get_message_handler(context: Context):
+def _get_message_handler(context: Context):
     async def message_handler(sender: Peer, _content: str, _timestamp: datetime):
         context.log.info(f"Got SYNC from {sender}")
         context.sync_peers.add(sender)
