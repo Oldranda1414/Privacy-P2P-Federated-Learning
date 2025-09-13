@@ -4,8 +4,11 @@ import json
 from communication.encodable import Encodable
 
 class Weights(Encodable):
-    def __init__(self, weights: list[np.ndarray]):
-        self._weights: list[np.ndarray] = weights
+    def __init__(self, weight_list: list[np.ndarray]):
+        self._weights: list[np.ndarray] = weight_list
+
+    def __str__(self):
+        return str(self._weights)
 
     def as_list(self):
         return self._weights
