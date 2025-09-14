@@ -6,16 +6,19 @@ from fsm.state import State
 from fsm.context import Context
 
 from communication.message import MessageType
-from machine_learning.weights import Weights
 from communication.encodable import Encodable
+
+from machine_learning.weights import Weights
+from machine_learning.dataset import get_dataset
+
 from peers import Peer
 
 def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.INITIAL_WEIGHTS, _get_message_handler(context))
     async def setup_handler() -> State:
         _start_heartbeat_service(context)
-        await _exchange_initial_weights(context)
         _load_dataset(context)
+        await _exchange_initial_weights(context)
         return State.TRAINING
     return setup_handler
 
@@ -46,4 +49,4 @@ async def _exchange_initial_weights(context: Context):
             await sleep(5)
 
 def _load_dataset(context: Context):
-    pass
+    context.dataset = get_dataset(context.owner)

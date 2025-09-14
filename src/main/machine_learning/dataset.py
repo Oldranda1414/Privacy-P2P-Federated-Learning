@@ -1,9 +1,11 @@
 import numpy as np
+import os
 from tensorflow.keras.datasets import imdb
 
-from peers import load_all_peers, Peer
+from peers import get_peer_number, load_all_peers, Peer
 
-PEER_JSON_FILE = "peers.json"
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress all TensorFlow logging
+# os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Additional suppression
 SPLIT_SEED = 1
 
 class Dataset:
@@ -22,18 +24,15 @@ class Dataset:
     def as_tuples(self) -> tuple[tuple[np.ndarray, np.ndarray], tuple[np.ndarray, np.ndarray]]:
         return self.train, self.test
 
+def get_validation_length() -> int:
+    return int(10000/get_peer_number())
+
 def get_dataset(owner: Peer) -> Dataset:
-    print("start get_datset")
-    peers = load_all_peers(PEER_JSON_FILE)
-    print("after load_all_peers")
+    peers = load_all_peers()
     ordered_peers = [value for _, value in sorted(peers.items())]
-    print("after ordered_peers")
     owner_index = ordered_peers.index(owner)
-    print("after owner_index")
     dataset = _load_IMDB()
-    print("after load_imdb")
     iid_datasets = _split_iid(dataset, len(ordered_peers), SPLIT_SEED)
-    print("after after split_iid")
     return iid_datasets[owner_index]
 
 def _load_IMDB() -> Dataset:

@@ -7,7 +7,7 @@ from fsm.context import Context
 def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
     async def secure_average_computation_handler() -> State:
         # TODO do actual SAC here
-        sac_time = 10
+        sac_time = 3
         context.log.info(f"doing sac for {sac_time}")
         await sleep(sac_time)
         if _training_complete(context):
@@ -17,6 +17,6 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
 
 def _training_complete(context: Context) -> bool:
     context.rounds_done += 1
-    if context.rounds_done == 5:
+    if context.rounds_done == 4:
         return True
     return False

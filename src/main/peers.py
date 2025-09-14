@@ -4,6 +4,8 @@ import os
 from environment import get_self_id
 from communication.encodable import Encodable
 
+PEER_JSON_FILE = "peers.json"
+
 class Peer(Encodable):
     def __init__(self, node_id: str, host: str, port: int):
         self.node_id = node_id
@@ -46,25 +48,29 @@ class Peer(Encodable):
         obj = json.loads(data.decode().strip())
         return cls.from_dict(obj)
 
-def load_self(peers_file: str) -> Peer:
+def get_peer_number():
+    peers = _load_peer_file()
+    return len(peers)
+
+def load_self() -> Peer:
     self_id = get_self_id()
-    peers = _load_peer_file(peers_file)
+    peers = _load_peer_file()
     return peers.pop(self_id)
 
-def load_peers(peers_file: str) -> dict[str, Peer]:
+def load_peers() -> dict[str, Peer]:
     self_id = get_self_id()
-    peers = load_all_peers(peers_file)
+    peers = load_all_peers()
     peers.pop(self_id)
     return peers
 
-def load_all_peers(peers_file: str) -> dict[str, Peer]:
-    peers = _load_peer_file(peers_file)
+def load_all_peers() -> dict[str, Peer]:
+    peers = _load_peer_file()
     return peers
 
-def _load_peer_file(path: str) -> dict[str, Peer]:
+def _load_peer_file() -> dict[str, Peer]:
     # look for file in this scipts directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    peers_file = os.path.join(script_dir, path)
+    peers_file = os.path.join(script_dir, PEER_JSON_FILE)
     
     with open(peers_file, 'r') as f:
         data = json.load(f)

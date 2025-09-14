@@ -1,13 +1,12 @@
 from machine_learning.dataset import get_dataset
 from machine_learning.dataset import _load_IMDB
-from fsm.context import PEER_JSON_FILE
 from peers import load_all_peers
 from machine_learning.model import Model
 
 def simple_dataset_loading():
     original = _load_IMDB()
     print("original loaded")
-    nodes = load_all_peers(PEER_JSON_FILE)
+    nodes = load_all_peers()
     print("nodes loaded")
     datasets = []
     get_dataset(list(nodes.values())[0])

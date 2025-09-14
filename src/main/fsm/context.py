@@ -11,15 +11,14 @@ from machine_learning.dataset import Dataset
 from fsm.state import State
 from fsm.handler.shutdown import get_stop
 
-PEER_JSON_FILE = "peers.json"
 PULSE_INTERVAL = 10
 TIMEOUT = 100
 CONNECTION_TIMEOUT = 10
 
 class Context:
     def __init__(self, quiet: bool = True):
-        self.owner = load_self(PEER_JSON_FILE)
-        self.peers = load_peers(PEER_JSON_FILE)
+        self.owner = load_self()
+        self.peers = load_peers()
         self.state = State.CONNECTING
         self.active = True
         self.rounds_done = 0
