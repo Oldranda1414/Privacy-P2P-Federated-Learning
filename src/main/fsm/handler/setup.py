@@ -14,6 +14,7 @@ def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.INITIAL_WEIGHTS, _get_message_handler(context))
     async def setup_handler() -> State:
         if context.owner.node_id == "node1":
+            context.model.initialize()
             initial_weights = context.model.get_weights() 
             try:
                 await context.comm.broadcast_message(MessageType.INITIAL_WEIGHTS, initial_weights)

@@ -6,7 +6,7 @@ from typing import Type
 from peers import Peer
 from communication.encodable import Encodable
 from machine_learning.weights import Weights
-from logger import get_logger
+from utils.logger import get_logger
 
 logger = get_logger("mess")
 

@@ -4,7 +4,7 @@ from typing import Awaitable, Callable, Dict
 
 # TODO undestand this better to document it in report
 
-from logger import get_logger
+from utils.logger import get_logger
 from peers import Peer
 
 from communication.message import Message, MessageType

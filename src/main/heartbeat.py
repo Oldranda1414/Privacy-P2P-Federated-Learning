@@ -5,7 +5,7 @@ from typing import Awaitable, Callable
 from communication.communicator import AsyncCommunicator
 from communication.message import MessageType
 from peers import Peer
-from logger import get_logger
+from utils.logger import get_logger
 
 PULSE_CONTENT = "I'm alive!"
 

@@ -1,7 +1,7 @@
 from asyncio import Task
 
 from communication.communicator import AsyncCommunicator
-from logger import get_logger
+from utils.logger import get_logger
 from peers import Peer, load_self, load_peers
 from heartbeat import HeartbeatService
 from machine_learning.model import Model

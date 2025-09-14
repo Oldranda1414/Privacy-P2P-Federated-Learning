@@ -2,7 +2,7 @@ from asyncio import create_task, run
 
 from fsm.finite_state_machine import FiniteStateMachine
 from fsm.handler.shutdown import get_stop
-from logger import get_logger
+from utils.logger import get_logger
 from environment import get_self_id
 
 
