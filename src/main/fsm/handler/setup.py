@@ -12,12 +12,12 @@ from peers import Peer
 
 def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
     # TODO change weights to initial weight in message type
-    context.comm.register_message_handler(MessageType.WEIGHTS, _get_message_handler(context))
+    context.comm.register_message_handler(MessageType.INITIAL_WEIGHTS, _get_message_handler(context))
     async def setup_handler() -> State:
         if context.owner.node_id == "node1":
             initial_weights = context.model.get_weights() 
             try:
-                await context.comm.broadcast_message(MessageType.WEIGHTS, initial_weights)
+                await context.comm.broadcast_message(MessageType.INITIAL_WEIGHTS, initial_weights)
             except Exception as e:
                 context.log.error(f"error occured when sending weights: {e}")
             context.log.info("sent initial weights")

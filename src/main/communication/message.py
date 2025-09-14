@@ -15,10 +15,10 @@ class MessageType(str, Enum):
     HANDSHAKE_ACK = "handshakeack"
     HEARTBEAT = "heartbeat"
     SYNC = "sync"
-    WEIGHTS = "weights"
+    INITIAL_WEIGHTS = "initial_weights"
 
 _decodable_contents: dict[MessageType, Type[Encodable]] = {
-        MessageType.WEIGHTS : Weights
+        MessageType.INITIAL_WEIGHTS: Weights
     }
 
 def has_decodeable_contents(message_type: MessageType) -> bool:
