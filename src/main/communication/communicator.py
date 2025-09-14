@@ -10,7 +10,8 @@ from peers import Peer
 from communication.message import Message, MessageType
 from communication.encodable import Encodable
 
-LIMIT = 10**7 
+# This value was emprically found to be sufficiently large
+MESSAGE_SIZE_LIMIT = 10**7 
 
 class AsyncCommunicator:
     def __init__(self, owner: Peer, connection_timeout: int, quiet: bool = True):
@@ -27,7 +28,7 @@ class AsyncCommunicator:
     async def start_server(self):
         """Start the communication server"""
         self.server = await asyncio.start_server(
-            self._handle_client, self.owner.host, self.owner.port, limit=LIMIT
+            self._handle_client, self.owner.host, self.owner.port, limit=MESSAGE_SIZE_LIMIT
         )
         self.running = True
         self.log.info(f"Server started on {self.owner.host}:{self.owner.port}")
@@ -89,7 +90,7 @@ class AsyncCommunicator:
     async def connect_to_peer(self, peer: Peer) -> bool:
         """Connect to a peer node"""
         try:
-            reader, writer = await asyncio.open_connection(peer.host, peer.port, limit=LIMIT)
+            reader, writer = await asyncio.open_connection(peer.host, peer.port, limit=MESSAGE_SIZE_LIMIT)
             handshake = Message(
                 MessageType.HANDSHAKE,
                 self.owner,
