@@ -23,7 +23,6 @@ def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
                 await sleep(5)
         context.heartbeat_task = create_task(context.heartbeat_service.run())
         return State.TRAINING
-
     return setup_handler
 
 def _get_message_handler(context: Context):

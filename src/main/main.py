@@ -1,4 +1,4 @@
-import asyncio
+from asyncio import create_task, run
 
 from fsm.finite_state_machine import FiniteStateMachine
 from fsm.handler.shutdown import get_stop
@@ -11,7 +11,7 @@ async def main():
 
     # Create fsm
     fsm = FiniteStateMachine((not get_self_id() == "node2"))
-    fsm_task = asyncio.create_task(fsm.run())
+    fsm_task = create_task(fsm.run())
 
     try:
         # Wait for FSM to complete or handle interrupts
@@ -26,5 +26,5 @@ async def main():
         log.info("Program terminated")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    run(main())
     
