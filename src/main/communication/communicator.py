@@ -22,8 +22,33 @@ class AsyncCommunicator:
         self.message_handlers: Dict[MessageType, Callable[[Peer, str | Encodable, datetime], Awaitable[None]]] = {}
         self.running = False
 
+        self._shutdown_event = asyncio.Event()
+        self._listener_tasks = {}
+
         self.log = get_logger("com")
         self.log.disabled = quiet
+
+    async def shutdown(self):
+        """Graceful shutdown"""
+        self._shutdown_event.set()
+        
+        # Cancel all listener tasks
+        for task in self._listener_tasks.values():
+            if not task.done():
+                task.cancel()
+        
+        # Wait for all tasks to complete
+        if self._listener_tasks:
+            await asyncio.gather(*self._listener_tasks.values(), 
+                                return_exceptions=True)
+        
+        # Close all connections
+        for writer in self.connections.values():
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except Exception:
+                pass
         
     async def start_server(self):
         """Start the communication server"""
@@ -120,8 +145,14 @@ class AsyncCommunicator:
                 self.connections[peer] = writer
                 self.log.info(f"Successfully connected to {peer.node_id} at {peer.host}:{peer.port}")
 
-                # Start listening for messages from this peer
-                asyncio.create_task(self._listen_to_peer(reader, writer, peer))
+                listener_task = asyncio.create_task(
+                        self._listen_to_peer(reader, writer, peer),
+                        name=f"listener_{peer.node_id}"
+                    )
+                self._listener_tasks[peer] = listener_task
+                    
+                # add callback to remove from tracking when done
+                listener_task.add_done_callback(lambda _: self._listener_tasks.pop(peer, None))
                 return True
 
             self.log.error(f"Unexpected handshake response from {peer.node_id}: {response.message_type}")
@@ -135,19 +166,36 @@ class AsyncCommunicator:
     async def _listen_to_peer(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter, peer: Peer):
         """Listen for messages from a connected peer"""
         try:
-            while True:
-                data = await reader.readline()
-                if not data:
+            while not self._shutdown_event.is_set():  # Add exit condition
+                try:
+                    data = await asyncio.wait_for(reader.readline(), timeout=1.0)
+                    if not data:
+                        break  # Connection closed by peer
+                        
+                    message = Message.decode(data)
+                    await self._process_message(message, writer)
+                    
+                except asyncio.TimeoutError:
+                    # Timeout allows checking for shutdown/cancellation
+                    continue
+                except asyncio.CancelledError:
+                    self.log.debug(f"Listener for peer {peer.node_id} cancelled")
                     break
                     
-                message = Message.decode(data)
-                await self._process_message(message, writer)
-                
         except Exception as e:
             self.log.error(f"Error listening to peer {peer.node_id}: {e}")
         finally:
+            # Proper cleanup
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except Exception as close_error:
+                self.log.debug(f"Error closing writer for {peer.node_id}: {close_error}")
+            
             if peer in self.connections:
                 del self.connections[peer]
+            
+            self.log.debug(f"Stopped listening to peer {peer.node_id}")
                 
     async def send_message(self, receiver: Peer, message_type: MessageType, content: str | Encodable):
         """Send a message to a specific receiver"""

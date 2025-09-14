@@ -30,6 +30,8 @@ To test the effect of SAC the following scenarios have been implemented:
 
 ## Requirements Analysis
 
+<!-- TODO check all sleeps and fine tune sleep times if possible. Ideally replace them with variables -->
+
 <!-- TODO check if these are right -->
 
 <!-- TODO check the commented ones -->
