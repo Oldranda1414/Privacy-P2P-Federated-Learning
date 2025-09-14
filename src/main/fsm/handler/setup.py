@@ -11,7 +11,6 @@ from communication.encodable import Encodable
 from peers import Peer
 
 def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
-    # TODO change weights to initial weight in message type
     context.comm.register_message_handler(MessageType.INITIAL_WEIGHTS, _get_message_handler(context))
     async def setup_handler() -> State:
         if context.owner.node_id == "node1":
