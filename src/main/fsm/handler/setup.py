@@ -16,10 +16,15 @@ def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
     async def setup_handler() -> State:
         if context.owner.node_id == "node1":
             initial_weights = context.model.get_weights() 
-            await context.comm.broadcast_message(MessageType.WEIGHTS, initial_weights)
+            try:
+                await context.comm.broadcast_message(MessageType.WEIGHTS, initial_weights)
+            except Exception as e:
+                context.log.error(f"error occured when sending weights: {e}")
+            context.log.info("sent initial weights")
             context.model_initialized = True
         else:
             while not context.model_initialized:
+                context.log.info("waiting for initial weights")
                 await sleep(5)
         context.heartbeat_task = create_task(context.heartbeat_service.run())
         return State.TRAINING
@@ -27,6 +32,7 @@ def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
 
 def _get_message_handler(context: Context):
     async def message_handler(_sender: Peer, content: str | Encodable, _timestamp: datetime):
+        context.log.info("received message weights")
         if isinstance(content, Weights):
             context.model.set_weights(content)
             context.model_initialized = True
@@ -34,5 +40,4 @@ def _get_message_handler(context: Context):
         else:
             raise ValueError("initial weights received are not compatible")
     return message_handler
-
 

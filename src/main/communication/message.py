@@ -70,6 +70,6 @@ class Message(Encodable):
         message_type = obj["type"]
         if has_decodeable_contents(message_type):
             ContentsType = get_contents_type(message_type)
-            obj["content"] = ContentsType.decode(obj["content"])
+            obj["content"] = ContentsType.from_dict(obj["content"])
         return cls.from_dict(obj)
 

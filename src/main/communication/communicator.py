@@ -10,6 +10,7 @@ from peers import Peer
 from communication.message import Message, MessageType
 from communication.encodable import Encodable
 
+LIMIT = 10**7 
 
 class AsyncCommunicator:
     def __init__(self, owner: Peer, connection_timeout: int, quiet: bool = True):
@@ -26,7 +27,7 @@ class AsyncCommunicator:
     async def start_server(self):
         """Start the communication server"""
         self.server = await asyncio.start_server(
-            self._handle_client, self.owner.host, self.owner.port
+            self._handle_client, self.owner.host, self.owner.port, limit=LIMIT
         )
         self.running = True
         self.log.info(f"Server started on {self.owner.host}:{self.owner.port}")
@@ -71,6 +72,7 @@ class AsyncCommunicator:
             response = Message(MessageType.HANDSHAKE_ACK, self.owner, message.sender, 'Connected successfully', datetime.now())
             await self._send_raw_message(writer, response)
         elif message.message_type in self.message_handlers.keys():
+            self.log.info(f"received message of type {message.message_type}")
             await self.message_handlers[message.message_type](message.sender, message.content, message.timestamp)
         else:
             raise Exception(f"No handler registered for messege of type {message.message_type}")
@@ -87,7 +89,7 @@ class AsyncCommunicator:
     async def connect_to_peer(self, peer: Peer) -> bool:
         """Connect to a peer node"""
         try:
-            reader, writer = await asyncio.open_connection(peer.host, peer.port)
+            reader, writer = await asyncio.open_connection(peer.host, peer.port, limit=LIMIT)
             handshake = Message(
                 MessageType.HANDSHAKE,
                 self.owner,
