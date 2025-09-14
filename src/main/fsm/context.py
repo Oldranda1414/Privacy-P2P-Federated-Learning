@@ -1,10 +1,12 @@
 from asyncio import Task
+from typing import Optional
 
 from communication.communicator import AsyncCommunicator
 from utils.logger import get_logger
 from peers import Peer, load_self, load_peers
 from heartbeat import HeartbeatService
 from machine_learning.model import Model
+from machine_learning.dataset import Dataset
 
 from fsm.state import State
 from fsm.handler.shutdown import get_stop
@@ -23,7 +25,7 @@ class Context:
         self.rounds_done = 0
 
         self.model = Model()
-        self.model_initialized = False
+        self.dataset: Optional[Dataset] = None
 
         self.comm = AsyncCommunicator(self.owner, CONNECTION_TIMEOUT)
         self.heartbeat_service = HeartbeatService(self.comm, self.peers, get_stop(self), PULSE_INTERVAL, TIMEOUT)
