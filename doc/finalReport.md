@@ -334,6 +334,16 @@ The current implementation implies knowledge on the number of peers involved and
 
 Distributed system design could be imployed to provide these desirable functionalities, allowing the project prototype to be closer to production ready code.
 
+#### Improve communication protocol
+
+The current implementation of the low level communication protocol could be improved significantly.
+
+Some possible improvements could be:
+
+- Automaitcally attempt to reconnect on peer disconnection.
+- Replace newline delimited json messages with length-prefixed framing, to enable the sending of arbitrarily large messages.
+- Improve general error detection and recovery.
+
 ### What I learned
 
 <!-- INSTRUCTIONS
