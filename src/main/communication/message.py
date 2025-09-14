@@ -67,9 +67,9 @@ class Message(Encodable):
     def decode(cls, data: bytes) -> "Message":
         """Decode JSON string to instance."""
         obj = json.loads(data.decode().strip())
-        message_type = obj["message_type"]
+        message_type = obj["type"]
         if has_decodeable_contents(message_type):
             ContentsType = get_contents_type(message_type)
-            obj["contents"] = ContentsType.decode(obj["contents"])
+            obj["content"] = ContentsType.decode(obj["content"])
         return cls.from_dict(obj)
 
