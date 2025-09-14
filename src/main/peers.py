@@ -53,8 +53,12 @@ def load_self(peers_file: str) -> Peer:
 
 def load_peers(peers_file: str) -> dict[str, Peer]:
     self_id = get_self_id()
-    peers = _load_peer_file(peers_file)
+    peers = load_all_peers(peers_file)
     peers.pop(self_id)
+    return peers
+
+def load_all_peers(peers_file: str) -> dict[str, Peer]:
+    peers = _load_peer_file(peers_file)
     return peers
 
 def _load_peer_file(path: str) -> dict[str, Peer]:

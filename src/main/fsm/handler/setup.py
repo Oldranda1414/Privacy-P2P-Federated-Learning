@@ -32,7 +32,6 @@ def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
 
 def _get_message_handler(context: Context):
     async def message_handler(_sender: Peer, content: str | Encodable, _timestamp: datetime):
-        context.log.info("received message weights")
         if isinstance(content, Weights):
             context.model.set_weights(content)
             context.model_initialized = True

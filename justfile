@@ -37,3 +37,8 @@ add *modules:
 remove *modules:
     uv --project src remove {{modules}}
 
+# Run debug testing facility
+[no-exit-message]
+test:
+    uv --project src run src/main/test.py
+
