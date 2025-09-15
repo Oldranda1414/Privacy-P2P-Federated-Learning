@@ -8,12 +8,10 @@ from environment import get_self_id
 async def main():
     log = get_logger("main")
 
-    # Create fsm
     fsm = FiniteStateMachine((not get_self_id() == "node2"))
     fsm_task = create_task(fsm.run())
 
     try:
-        # Wait for FSM to complete or handle interrupts
         await fsm_task
     except KeyboardInterrupt:
         log.info("Received interrupt signal")
