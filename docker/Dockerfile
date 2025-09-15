@@ -2,6 +2,9 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# set environment variable for TensorFlow logging
+ENV TF_CPP_MIN_LOG_LEVEL=3
+
 # Install python build manager
 RUN pip install uv
 

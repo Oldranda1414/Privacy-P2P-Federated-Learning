@@ -43,6 +43,7 @@ class Model:
                 partial_y_train,
                 epochs=1,
                 batch_size=512,
-                validation_data=(x_val, y_val)
+                validation_data=(x_val, y_val),
+                verbose=0
             )
         return Weights(self.keras_model.get_weights())

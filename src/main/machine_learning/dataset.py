@@ -1,11 +1,8 @@
 import numpy as np
-import os
 from tensorflow.keras.datasets import imdb
 
 from peers import get_peer_number, load_all_peers, Peer
 
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress all TensorFlow logging
-# os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Additional suppression
 SPLIT_SEED = 1
 
 class Dataset:

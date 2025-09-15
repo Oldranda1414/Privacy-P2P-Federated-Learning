@@ -5,7 +5,6 @@ from fsm.handler.shutdown import get_stop
 from utils.logger import get_logger
 from environment import get_self_id
 
-
 async def main():
     log = get_logger("main")
 
