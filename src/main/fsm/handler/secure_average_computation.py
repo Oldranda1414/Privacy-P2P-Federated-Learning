@@ -13,6 +13,7 @@ from sac import generate_partitions
 from peers import Peer
 from machine_learning.weights import Weights, sum_weights
 
+# TODO check if this is a good value
 ACCURACY_THRESHOLD = 0.95
 
 def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
@@ -67,6 +68,7 @@ async def _send_weights(comm: AsyncCommunicator, peers: list[Peer], weights: lis
     for i in range(len(peers)):
         await comm.send_message(peers[i], MessageType.PARTITIONED_WEIGHTS, weights[i])
 
+# TODO ensure all hosts are okey with stopping here.
 def _training_complete(context: Context) -> bool:
     if context.training_history:
         current_accuracy = context.training_history.validation_accuracy[-1]
