@@ -16,9 +16,13 @@ class MessageType(str, Enum):
     HEARTBEAT = "heartbeat"
     SYNC = "sync"
     INITIAL_WEIGHTS = "initial_weights"
+    PARTITIONED_WEIGHTS = "partitioned_weights"
+    SUBTOTAL_WEIGHTS = "subtotal_weights"
 
 _decodable_contents: dict[MessageType, Type[Encodable]] = {
-        MessageType.INITIAL_WEIGHTS: Weights
+        MessageType.INITIAL_WEIGHTS: Weights,
+        MessageType.PARTITIONED_WEIGHTS: Weights,
+        MessageType.SUBTOTAL_WEIGHTS: Weights
     }
 
 def has_decodeable_contents(message_type: MessageType) -> bool:

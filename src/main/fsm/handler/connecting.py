@@ -1,4 +1,5 @@
 from typing import Callable, Awaitable
+from asyncio import create_task
 
 from peers import Peer
 
@@ -21,6 +22,7 @@ def get_connecting_handler(context: Context) -> Callable[[], Awaitable[State]]:
                 return State.SHUTDOWN
 
         context.log.info("Successfully connected to all peers")
+        _start_heartbeat_service(context)
         return State.SETUP
 
     return connecting_handler
@@ -33,3 +35,6 @@ async def _try_connect(peer: Peer, context: Context) -> bool:
             return True
         context.log.warning(f"Attempt {attempt} to connect with {peer.node_id} failed")
     return False
+
+def _start_heartbeat_service(context: Context):
+    context.heartbeat_task = create_task(context.heartbeat_service.run())

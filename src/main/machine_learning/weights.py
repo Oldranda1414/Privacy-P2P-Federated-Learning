@@ -1,5 +1,7 @@
 import numpy as np
 import json
+from functools import reduce
+import operator
 
 from communication.encodable import Encodable
 
@@ -9,6 +11,31 @@ class Weights(Encodable):
 
     def __str__(self):
         return str(self._weights)
+
+    def __add__(self, other: "Weights"):
+        if not isinstance(other, Weights):
+            return NotImplemented
+
+        self_arrays = self.as_list()
+        other_arrays = other.as_list()
+
+        if len(self_arrays) != len(other_arrays):
+            raise ValueError("Weights objects must have the same number of arrays")
+
+        summed_arrays = []
+        for a, b in zip(self_arrays, other_arrays):
+            if a.shape != b.shape:
+                raise ValueError("Weights objects must have the same array shapes")
+            summed_arrays.append(a + b)
+        return Weights(summed_arrays)
+
+    def __radd__(self, other: "Weights") -> "Weights":
+        if other == 0:
+            return self
+        return self.__add__(other)
+
+    def __repr__(self):
+        return f"Weights({self.as_list()})"
 
     def as_list(self):
         return self._weights
@@ -57,3 +84,5 @@ class Weights(Encodable):
         obj = json.loads(data.decode().strip())
         return cls.from_dict(obj)
 
+def sum_weights(weights_list: list["Weights"]) -> "Weights":
+    return reduce(operator.add, weights_list)

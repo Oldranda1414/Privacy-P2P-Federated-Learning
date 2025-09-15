@@ -1,4 +1,4 @@
-from asyncio import create_task, sleep
+from asyncio import sleep
 from typing import Callable, Awaitable
 from datetime import datetime
 
@@ -16,7 +16,6 @@ from peers import Peer
 def get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.INITIAL_WEIGHTS, _get_message_handler(context))
     async def setup_handler() -> State:
-        _start_heartbeat_service(context)
         _load_dataset(context)
         await _exchange_initial_weights(context)
         return State.TRAINING
@@ -30,9 +29,6 @@ def _get_message_handler(context: Context):
         else:
             raise ValueError("initial weights received are not compatible")
     return message_handler
-
-def _start_heartbeat_service(context: Context):
-    context.heartbeat_task = create_task(context.heartbeat_service.run())
 
 async def _exchange_initial_weights(context: Context):
     if context.owner.node_id == "node1":

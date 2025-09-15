@@ -46,4 +46,4 @@ class Model:
                 validation_data=(x_val, y_val),
                 verbose=0
             )
-        return Weights(self.keras_model.get_weights())
+

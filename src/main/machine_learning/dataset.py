@@ -15,6 +15,7 @@ class Dataset:
             raise ValueError(
                 f"Number of test samples ({test[0].shape[0]}) != number of test labels ({test[1].shape[0]})"
             )
+        # TODO consider adding validation directly instead of doing it every time (also check Model.train())
         self.train = train
         self.test = test
 
