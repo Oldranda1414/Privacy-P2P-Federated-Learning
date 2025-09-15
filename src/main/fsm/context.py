@@ -1,16 +1,17 @@
 from asyncio import Task
-from typing import Optional
-
-from communication.communicator import AsyncCommunicator
-from machine_learning.weights import Weights
-from utils.logger import get_logger
-from peers import Peer, load_self, load_peers
-from heartbeat import HeartbeatService
-from machine_learning.model import Model
-from machine_learning.dataset import Dataset
 
 from fsm.state import State
 from fsm.handler.shutdown import get_stop
+
+from machine_learning.model import Model
+from machine_learning.dataset import Dataset
+from machine_learning.history import History
+from machine_learning.weights import Weights
+
+from communication.communicator import AsyncCommunicator
+from utils.logger import get_logger
+from peers import Peer, load_self, load_peers
+from heartbeat import HeartbeatService
 
 PULSE_INTERVAL = 10
 TIMEOUT = 100
@@ -26,7 +27,8 @@ class Context:
         self.rounds_done = 0
 
         self.model = Model()
-        self.dataset: Optional[Dataset] = None
+        self.dataset: Dataset | None = None
+        self.training_history: History | None = None
         self.received = ReceivedWeights()
 
         self.comm = AsyncCommunicator(self.owner, CONNECTION_TIMEOUT)
@@ -35,7 +37,7 @@ class Context:
 
         self.log = get_logger("context")
         self.log.disabled = quiet
-        self.sync_peers: set[Peer] = set()  # track peers that reported "done"
+        self.sync_peers: set[Peer] = set()
 
 class ReceivedWeights:
     def __init__(self):

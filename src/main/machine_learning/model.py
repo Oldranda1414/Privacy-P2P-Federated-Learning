@@ -3,6 +3,7 @@ from tensorflow.keras import layers
 
 from machine_learning.weights import Weights
 from machine_learning.dataset import Dataset, get_validation_length
+from machine_learning.history import History
 from utils.required_init import requires_initialization
 
 class Model:
@@ -31,19 +32,20 @@ class Model:
         self.initialize()
 
     @requires_initialization
-    def train(self, dataset: Dataset):
+    def train(self, dataset: Dataset) -> History:
         x_train, y_train = dataset.train
         validation_len = get_validation_length()
         x_val = x_train[:validation_len]
         partial_x_train = x_train[validation_len:]
         y_val = y_train[:validation_len]
         partial_y_train = y_train[validation_len:]
-        self.keras_model.fit(
+        keras_history = self.keras_model.fit(
                 partial_x_train,
                 partial_y_train,
                 epochs=1,
                 batch_size=512,
                 validation_data=(x_val, y_val),
                 verbose=0
-            )
+            ).history
+        return History(keras_history["accuracy"], keras_history["loss"], keras_history["val_accuracy"], keras_history["val_loss"])
 

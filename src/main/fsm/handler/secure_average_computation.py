@@ -1,7 +1,5 @@
 from typing import Callable, Awaitable
-from asyncio import sleep
 from datetime import datetime
-from logging import Logger
 
 from communication.message import MessageType
 from communication.encodable import Encodable
@@ -9,10 +7,13 @@ from communication.communicator import AsyncCommunicator
 
 from fsm.state import State
 from fsm.context import Context
+from fsm.handler.waiting import wait_for_sync
 
 from sac import generate_partitions
 from peers import Peer
 from machine_learning.weights import Weights, sum_weights
+
+ACCURACY_THRESHOLD = 0.95
 
 def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.PARTITIONED_WEIGHTS, _get_partition_message_handler(context))
@@ -21,17 +22,16 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
         peers = list(context.peers.values())
         number_of_peers = len(peers)
         number_of_partitions = number_of_peers + 1
-        sleep_time = 5
         context.log.info("doing sac...")
 
         weight_partitions = generate_partitions(context.model.get_weights(), number_of_partitions)
         kept_partition = weight_partitions[0]
         await _send_weights(context.comm, peers, weight_partitions[1:])
-        await _wait_for_sync(context.received.partitions, number_of_peers, context.log, sleep_time, "PARTITION")
+        await wait_for_sync(context.received.partitions, number_of_peers, context.log, "PARTITION")
 
         calculated_subtotal = sum_weights([kept_partition] + context.received.partitions)
         await context.comm.broadcast_message(MessageType.SUBTOTAL_WEIGHTS, calculated_subtotal)
-        await _wait_for_sync(context.received.subtotals, number_of_peers, context.log, sleep_time, "SUBTOTAL")
+        await wait_for_sync(context.received.subtotals, number_of_peers, context.log, "SUBTOTAL")
         new_weights = sum_weights([calculated_subtotal] + context.received.subtotals)
         context.model.set_weights(new_weights)
 
@@ -61,11 +61,6 @@ def _get_subtotal_message_handler(context: Context):
             raise ValueError("subtotal weights received are not compatible")
     return message_handler
 
-async def _wait_for_sync(to_be_filled: list, filled_len: int, log: Logger, sleep_time: int, name: str):
-    while len(to_be_filled) < filled_len:
-        log.info(f"{name} - waiting for {filled_len - len(to_be_filled)} peers")
-        await sleep(sleep_time)
-
 async def _send_weights(comm: AsyncCommunicator, peers: list[Peer], weights: list[Weights]):
     if len(peers) != len(weights):
         raise ValueError("peers and weights length must be the same")
@@ -73,8 +68,10 @@ async def _send_weights(comm: AsyncCommunicator, peers: list[Peer], weights: lis
         await comm.send_message(peers[i], MessageType.PARTITIONED_WEIGHTS, weights[i])
 
 def _training_complete(context: Context) -> bool:
-    context.rounds_done += 1
-    if context.rounds_done == 4:
-        return True
+    if context.training_history:
+        current_accuracy = context.training_history.validation_accuracy[-1]
+        context.log.info(f"accuracy obtained: {current_accuracy}")
+        if current_accuracy >= ACCURACY_THRESHOLD:
+            return True
     return False
 
