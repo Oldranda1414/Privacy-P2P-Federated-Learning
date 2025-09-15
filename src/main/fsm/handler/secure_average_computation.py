@@ -27,11 +27,11 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
         weight_partitions = generate_partitions(context.model.get_weights(), number_of_partitions)
         kept_partition = weight_partitions[0]
         await _send_weights(context.comm, peers, weight_partitions[1:])
-        await _wait_for_sync(context.received_weights, number_of_peers, context.log, sleep_time)
+        await _wait_for_sync(context.received_weights, number_of_peers, context.log, sleep_time, "PARTITION")
 
         calculated_subtotal = sum_weights([kept_partition] + context.received_weights)
         await context.comm.broadcast_message(MessageType.SUBTOTAL_WEIGHTS, calculated_subtotal)
-        await _wait_for_sync(context.received_subtotals, number_of_peers, context.log, sleep_time)
+        await _wait_for_sync(context.received_subtotals, number_of_peers, context.log, sleep_time, "SUBTOTAL")
         new_weights = sum_weights([calculated_subtotal] + context.received_subtotals)
         context.model.set_weights(new_weights)
 
@@ -43,8 +43,6 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
             return State.SAVING_MODEL
         return State.TRAINING
     return secure_average_computation_handler
-
-# TODO the following are close to identical, probably better refactor for dry. consider refactoring also other message handlers as they seem to be very similar
 
 def _get_partition_message_handler(context: Context):
     async def message_handler(_sender: Peer, content: str | Encodable, _timestamp: datetime):
@@ -64,10 +62,9 @@ def _get_subtotal_message_handler(context: Context):
             raise ValueError("subtotal weights received are not compatible")
     return message_handler
 
-# TODO think about generalizing this for other handlers
-async def _wait_for_sync(to_be_filled: list, filled_len: int, log: Logger, sleep_time: int):
+async def _wait_for_sync(to_be_filled: list, filled_len: int, log: Logger, sleep_time: int, name: str):
     while len(to_be_filled) < filled_len:
-        log.info(f"waiting for {filled_len - len(to_be_filled)} peers")
+        log.info(f"{name} - waiting for {filled_len - len(to_be_filled)} peers")
         await sleep(sleep_time)
 
 async def _send_weights(comm: AsyncCommunicator, peers: list[Peer], weights: list[Weights]):
