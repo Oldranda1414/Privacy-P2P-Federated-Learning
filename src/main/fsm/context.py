@@ -27,15 +27,22 @@ class Context:
 
         self.model = Model()
         self.dataset: Optional[Dataset] = None
-        # TODO consider creating custom data object for this stuff
-        self.received_weights: list[Weights] = []
-        self.received_subtotals: list[Weights] = []
+        self.received = ReceivedWeights()
 
         self.comm = AsyncCommunicator(self.owner, CONNECTION_TIMEOUT)
         self.heartbeat_service = HeartbeatService(self.comm, self.peers, get_stop(self), PULSE_INTERVAL, TIMEOUT)
         self.heartbeat_task: Task | None = None
 
-        self.log = get_logger("fsm")
+        self.log = get_logger("context")
         self.log.disabled = quiet
         self.sync_peers: set[Peer] = set()  # track peers that reported "done"
+
+class ReceivedWeights:
+    def __init__(self):
+        self.partitions: list[Weights] = []
+        self.subtotals: list[Weights] = []
+
+    def reset(self):
+        self.partitions: list[Weights] = []
+        self.subtotals: list[Weights] = []
 

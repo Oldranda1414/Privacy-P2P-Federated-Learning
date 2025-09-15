@@ -27,17 +27,16 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
         weight_partitions = generate_partitions(context.model.get_weights(), number_of_partitions)
         kept_partition = weight_partitions[0]
         await _send_weights(context.comm, peers, weight_partitions[1:])
-        await _wait_for_sync(context.received_weights, number_of_peers, context.log, sleep_time, "PARTITION")
+        await _wait_for_sync(context.received.partitions, number_of_peers, context.log, sleep_time, "PARTITION")
 
-        calculated_subtotal = sum_weights([kept_partition] + context.received_weights)
+        calculated_subtotal = sum_weights([kept_partition] + context.received.partitions)
         await context.comm.broadcast_message(MessageType.SUBTOTAL_WEIGHTS, calculated_subtotal)
-        await _wait_for_sync(context.received_subtotals, number_of_peers, context.log, sleep_time, "SUBTOTAL")
-        new_weights = sum_weights([calculated_subtotal] + context.received_subtotals)
+        await _wait_for_sync(context.received.subtotals, number_of_peers, context.log, sleep_time, "SUBTOTAL")
+        new_weights = sum_weights([calculated_subtotal] + context.received.subtotals)
         context.model.set_weights(new_weights)
 
         # reset context arrays for new iteration
-        context.received_weights = []
-        context.received_subtotals = []
+        context.received.reset()
 
         if _training_complete(context):
             return State.SAVING_MODEL
@@ -47,7 +46,7 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
 def _get_partition_message_handler(context: Context):
     async def message_handler(_sender: Peer, content: str | Encodable, _timestamp: datetime):
         if isinstance(content, Weights):
-            context.received_weights.append(content)
+            context.received.partitions.append(content)
             context.log.info("received partitioned weights")
         else:
             raise ValueError("partitioned weights received are not compatible")
@@ -56,7 +55,7 @@ def _get_partition_message_handler(context: Context):
 def _get_subtotal_message_handler(context: Context):
     async def message_handler(_sender: Peer, content: str | Encodable, _timestamp: datetime):
         if isinstance(content, Weights):
-            context.received_subtotals.append(content)
+            context.received.subtotals.append(content)
             context.log.info("received subtotal weights")
         else:
             raise ValueError("subtotal weights received are not compatible")
