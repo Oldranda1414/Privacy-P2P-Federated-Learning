@@ -29,7 +29,9 @@ def get_termination_handler(context: Context) -> Callable[[], Awaitable[State]]:
         context.termination_votes.append(vote)
 
         await wait_for_sync(context.termination_votes, len(context.peers) + 1, context.log, "TERMINATION VOTES")
-        if TerminationVote.AGAINST in context.termination_votes:
+        vote_verdict = _continue_training(context)
+        context.termination_votes = []
+        if vote_verdict:
             return State.TRAINING
         else:
             return State.SAVING_MODEL
@@ -37,8 +39,8 @@ def get_termination_handler(context: Context) -> Callable[[], Awaitable[State]]:
 
 def _get_message_handler(context: Context):
     async def message_handler(sender: Peer, content: str, _timestamp: datetime):
-        context.log.info(f"Got termination vote from {sender}: {content}")
         vote = TerminationVote(content)
+        context.log.info(f"received termination vote from {sender}: {vote.value}")
         context.termination_votes.append(vote)
     return message_handler
 
@@ -51,6 +53,10 @@ def _training_complete(context: Context) -> bool:
             return True
         elif context.rounds_done >= MAX_ROUNDS:
             return True
-
     return False
+
+def _continue_training(context: Context) -> bool:
+    if TerminationVote.AGAINST in context.termination_votes:
+        return False
+    return True
 

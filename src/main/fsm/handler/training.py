@@ -28,7 +28,7 @@ def get_training_handler(context: Context) -> Callable[[], Awaitable[State]]:
 
 def _get_message_handler(context: Context):
     async def message_handler(sender: Peer, _content: str, _timestamp: datetime):
-        context.log.info(f"Got SYNC from {sender}")
+        context.log.info(f"received SYNC from {sender}")
         context.sync_peers.add(sender)
 
     return message_handler
