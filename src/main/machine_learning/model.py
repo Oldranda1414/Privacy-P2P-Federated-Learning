@@ -49,3 +49,7 @@ class Model:
             ).history
         return History(keras_history["accuracy"], keras_history["loss"], keras_history["val_accuracy"], keras_history["val_loss"])
 
+    @requires_initialization
+    def save(self, filepath: str):
+        self.keras_model.save(filepath)
+

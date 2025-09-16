@@ -19,3 +19,6 @@ doc/assets/mermaid
 
 # downloaded dataset directory
 dataset
+
+# node outputs:
+docker/output/*
