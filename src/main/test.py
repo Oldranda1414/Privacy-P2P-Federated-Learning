@@ -68,7 +68,8 @@ def secure_avarage_computation():
     weights1 = Weights([arr1])
     weights2 = Weights([arr2])
     weights3 = Weights([arr3])
-    expected_average = sum_weights([weights1, weights2, weights3]) / 2
+    number_of_weights = 3
+    expected_average = sum_weights([weights1, weights2, weights3]) / number_of_weights
     print(f"expected average: {expected_average}")
     # partitioning
     partitions1 = generate_partitions(weights1, 3)
@@ -79,7 +80,7 @@ def secure_avarage_computation():
     subtotal2 = partitions1[2] + partitions2[0] + partitions3[1]
     subtotal3 = partitions1[1] + partitions2[2] + partitions3[0]
     # total
-    computed_total = sum_weights([subtotal1, subtotal2, subtotal3]) / 3
+    computed_total = sum_weights([subtotal1, subtotal2, subtotal3]) / number_of_weights
     print(f"computed: {computed_total}")
 
 def main():
