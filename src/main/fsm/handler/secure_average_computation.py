@@ -13,10 +13,6 @@ from sac import generate_partitions
 from peers import Peer
 from machine_learning.weights import Weights, sum_weights
 
-# TODO check if this is a good value
-ACCURACY_THRESHOLD = 0.88
-MAX_ROUNDS = 9
-
 def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.PARTITIONED_WEIGHTS, _get_partition_message_handler(context))
     context.comm.register_message_handler(MessageType.SUBTOTAL_WEIGHTS, _get_subtotal_message_handler(context))
@@ -39,10 +35,7 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
 
         # reset context arrays for new iteration
         context.received.reset()
-
-        if _training_complete(context):
-            return State.SAVING_MODEL
-        return State.TRAINING
+        return State.TERMINATION_CHECK
     return secure_average_computation_handler
 
 def _get_partition_message_handler(context: Context):
@@ -68,17 +61,4 @@ async def _send_weights(comm: AsyncCommunicator, peers: list[Peer], weights: lis
         raise ValueError("peers and weights length must be the same")
     for i in range(len(peers)):
         await comm.send_message(peers[i], MessageType.PARTITIONED_WEIGHTS, weights[i])
-
-# TODO ensure all hosts are okey with stopping here.
-def _training_complete(context: Context) -> bool:
-    if context.training_history:
-        context.rounds_done += 1
-        current_accuracy = context.training_history.validation_accuracy[-1]
-        context.log.info(f"accuracy obtained: {current_accuracy}")
-        if current_accuracy >= ACCURACY_THRESHOLD:
-            return True
-        elif context.rounds_done >= MAX_ROUNDS:
-            return True
-
-    return False
 

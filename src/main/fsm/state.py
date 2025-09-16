@@ -1,10 +1,11 @@
 from enum import Enum
 
 class State(Enum):
-    CONNECTING = "connecting"
-    SETUP = "setup"
-    TRAINING = "training"
-    SECURE_AVERAGE_COMPUTATION = "secure_average_computation"
-    SAVING_MODEL = "saving_model"
-    SHUTDOWN = "shutdown"
+    CONNECTING = "CONNECTING"
+    SETUP = "SETUP"
+    TRAINING = "TRAINING"
+    SECURE_AVERAGE_COMPUTATION = "SECURE_AVERAGE_COMPUTATION"
+    SAVING_MODEL = "SAVING_MODEL"
+    TERMINATION_CHECK = "TERMInatioN_CHECK"
+    SHUTDOWN = "SHUTDOWN"
 

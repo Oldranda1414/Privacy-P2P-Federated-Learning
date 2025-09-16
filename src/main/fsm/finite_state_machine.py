@@ -7,6 +7,7 @@ from fsm.handler.connecting import get_connecting_handler
 from fsm.handler.setup import get_setup_handler
 from fsm.handler.training import get_training_handler
 from fsm.handler.secure_average_computation import get_sac_handler
+from fsm.handler.termination import get_termination_handler
 from fsm.handler.saving import get_saving_handler
 from fsm.handler.shutdown import get_shutdown_handler
 from utils.logger import get_logger
@@ -21,6 +22,7 @@ class FiniteStateMachine:
             State.SETUP : get_setup_handler(self.context),
             State.TRAINING : get_training_handler(self.context),
             State.SECURE_AVERAGE_COMPUTATION : get_sac_handler(self.context),
+            State.TERMINATION_CHECK : get_termination_handler(self.context),
             State.SAVING_MODEL : get_saving_handler(self.context),
             State.SHUTDOWN : get_shutdown_handler(self.context)
         }

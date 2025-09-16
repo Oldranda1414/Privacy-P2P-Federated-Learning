@@ -18,6 +18,7 @@ class MessageType(str, Enum):
     INITIAL_WEIGHTS = "initial_weights"
     PARTITIONED_WEIGHTS = "partitioned_weights"
     SUBTOTAL_WEIGHTS = "subtotal_weights"
+    TERMINATION = "termination"
 
 _decodable_contents: dict[MessageType, Type[Encodable]] = {
         MessageType.INITIAL_WEIGHTS: Weights,
