@@ -1,9 +1,8 @@
-from typing import Callable, Awaitable, TYPE_CHECKING
+from typing import Callable, Awaitable
 from datetime import datetime
 from enum import Enum
 
-if TYPE_CHECKING: # Importing only for type checking to prevent circular import
-    from fsm.context import Context
+from fsm.context import Context
 from fsm.state import State
 from fsm.handler.waiting import wait_for_sync
 

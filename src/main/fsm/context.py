@@ -1,8 +1,10 @@
+from typing import TYPE_CHECKING
 from asyncio import Task
 
 from fsm.state import State
 from fsm.handler.shutdown import get_stop
-from fsm.handler.termination import TerminationVote
+if TYPE_CHECKING: # Importing only for type checking to prevent circular import
+    from fsm.handler.termination import TerminationVote
 
 from machine_learning.model import Model
 from machine_learning.dataset import Dataset
