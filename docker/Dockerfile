@@ -12,6 +12,8 @@ RUN pip install uv
 COPY src/pyproject.toml src/uv.lock ./src/
 RUN uv sync --frozen --project src
 
+COPY dataset/ ./dataset
 COPY src/ ./src
+RUN rm -rf src/.venv
 
 ENTRYPOINT ["uv", "--project", "src", "run", "src/main/main.py"]

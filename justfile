@@ -17,7 +17,7 @@ doc:
 
 # Run the p2p simulation
 [no-exit-message]
-run: clean
+run: download_dataset clean
     docker compose -f docker/docker-compose.yml build
     docker compose -f docker/docker-compose.yml up
 
@@ -42,3 +42,7 @@ remove *modules:
 test:
     uv --project src run src/main/test.py
 
+# Download the imdb dataset
+[no-exit-message]
+download_dataset:
+    uv --project src run src/util/download_dataset.py -q

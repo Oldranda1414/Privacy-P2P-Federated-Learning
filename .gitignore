@@ -17,3 +17,5 @@ wheels/
 doc/build
 doc/assets/mermaid
 
+# downloaded dataset directory
+src/dataset

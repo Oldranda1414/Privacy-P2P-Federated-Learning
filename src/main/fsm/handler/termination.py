@@ -13,6 +13,7 @@ from peers import Peer
 ACCURACY_THRESHOLD = 0.88
 MAX_ROUNDS = 15
 
+# Make termination vote Encodable
 class TerminationVote(Enum):
     IN_FAVOR = "in_favor"
     AGAINST = "against"
