@@ -26,16 +26,16 @@ def get_termination_handler(context: Context) -> Callable[[], Awaitable[State]]:
             vote = TerminationVote.IN_FAVOR
         else:
             vote = TerminationVote.AGAINST
-        await context.comm.broadcast_message(MessageType.TERMINATION, str(vote))
+        await context.comm.broadcast_message(MessageType.TERMINATION, vote.value)
         context.termination_votes.append(vote)
 
         await wait_for_sync(context.termination_votes, len(context.peers) + 1, context.log, "TERMINATION VOTES")
         vote_verdict = _continue_training(context)
         context.termination_votes = []
         if vote_verdict:
-            return State.TRAINING
-        else:
             return State.SAVING_MODEL
+        else:
+            return State.TRAINING
     return termination_handler
 
 def _get_message_handler(context: Context):

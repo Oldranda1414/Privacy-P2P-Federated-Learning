@@ -17,7 +17,7 @@ doc:
 
 # Run the p2p simulation
 [no-exit-message]
-run: download_dataset clean
+run: download_dataset remove_venv clean
     docker compose -f docker/docker-compose.yml build
     docker compose -f docker/docker-compose.yml up
 
@@ -46,3 +46,8 @@ test:
 [no-exit-message]
 download_dataset:
     uv --project src run src/util/download_dataset.py -q
+
+# Remove local .venv file
+[no-exit-message]
+remove_venv:
+    ./src/util/remove_venv.sh
