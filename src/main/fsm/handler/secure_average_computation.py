@@ -34,7 +34,7 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
         calculated_subtotal = sum_weights([kept_partition] + context.received.partitions)
         await context.comm.broadcast_message(MessageType.SUBTOTAL_WEIGHTS, calculated_subtotal)
         await wait_for_sync(context.received.subtotals, number_of_peers, context.log, "SUBTOTAL")
-        new_weights = sum_weights([calculated_subtotal] + context.received.subtotals)
+        new_weights = sum_weights([calculated_subtotal] + context.received.subtotals) / number_of_partitions
         context.model.set_weights(new_weights)
 
         # reset context arrays for new iteration
