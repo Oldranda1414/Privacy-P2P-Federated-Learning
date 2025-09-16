@@ -11,7 +11,7 @@ from communication.message import Message, MessageType
 from communication.encodable import Encodable
 
 # This value was emprically found to be sufficiently large
-MESSAGE_SIZE_LIMIT = 10**7 
+MESSAGE_SIZE_LIMIT = 10**7
 
 class AsyncCommunicator:
     def __init__(self, owner: Peer, connection_timeout: int, quiet: bool = True):

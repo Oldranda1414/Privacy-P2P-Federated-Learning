@@ -14,7 +14,8 @@ from peers import Peer
 from machine_learning.weights import Weights, sum_weights
 
 # TODO check if this is a good value
-ACCURACY_THRESHOLD = 0.95
+ACCURACY_THRESHOLD = 0.88
+MAX_ROUNDS = 9
 
 def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.PARTITIONED_WEIGHTS, _get_partition_message_handler(context))
@@ -71,9 +72,13 @@ async def _send_weights(comm: AsyncCommunicator, peers: list[Peer], weights: lis
 # TODO ensure all hosts are okey with stopping here.
 def _training_complete(context: Context) -> bool:
     if context.training_history:
+        context.rounds_done += 1
         current_accuracy = context.training_history.validation_accuracy[-1]
         context.log.info(f"accuracy obtained: {current_accuracy}")
         if current_accuracy >= ACCURACY_THRESHOLD:
             return True
+        elif context.rounds_done >= MAX_ROUNDS:
+            return True
+
     return False
 

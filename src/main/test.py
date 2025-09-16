@@ -2,6 +2,7 @@ from machine_learning.dataset import get_dataset
 from machine_learning.dataset import _load_IMDB
 from peers import load_all_peers
 from machine_learning.model import Model
+from machine_learning.dataset import get_dataset
 
 def simple_dataset_loading():
     original = _load_IMDB()
@@ -36,9 +37,17 @@ def initialized_util():
     model.set_weights(w)
     print(f"is model initialized after manually setting weights: {model.is_initialized()}")
 
+def baseline_accuracy():
+    model = Model()
+    model.initialize()
+    dataset = _load_IMDB
+    for _ in range(15):
+        history = model.train(dataset)
+        print(f"validation accuracy: {history.validation_accuracy}")
+
 def main():
     try:
-       initialized_util()
+        baseline_accuracy()
     except Exception as e:
         print(f"something went wrong: {e}")
 
