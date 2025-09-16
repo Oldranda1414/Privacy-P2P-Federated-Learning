@@ -37,6 +37,12 @@ class Weights(Encodable):
     def __repr__(self):
         return f"Weights({self.as_list()})"
 
+    def __truediv__(self, scalar: float) -> "Weights":
+        if not isinstance(scalar, (int, float)):
+            return NotImplemented
+        divided_arrays = [arr / scalar for arr in self._weights]
+        return Weights(divided_arrays)
+
     def as_list(self):
         return self._weights
 
