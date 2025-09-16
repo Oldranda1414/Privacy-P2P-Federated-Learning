@@ -1,9 +1,10 @@
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, TYPE_CHECKING
 from datetime import datetime
 from enum import Enum
 
+if TYPE_CHECKING: # Importing only for type checking to prevent circular import
+    from fsm.context import Context
 from fsm.state import State
-from fsm.context import Context
 from fsm.handler.waiting import wait_for_sync
 
 from communication.message import MessageType
@@ -20,11 +21,15 @@ class TerminationVote(Enum):
 def get_termination_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.TERMINATION, _get_message_handler(context))
     async def termination_handler() -> State:
+        vote: TerminationVote | None = None
         if _training_complete(context):
-            await context.comm.broadcast_message(MessageType.TERMINATION, str(TerminationVote.IN_FAVOR))
+            vote = TerminationVote.IN_FAVOR
         else:
-            await context.comm.broadcast_message(MessageType.TERMINATION, str(TerminationVote.AGAINST))
-        await wait_for_sync(context.termination_votes, len(context.peers), context.log, "TERMINATION VOTES")
+            vote = TerminationVote.AGAINST
+        await context.comm.broadcast_message(MessageType.TERMINATION, str(vote))
+        context.termination_votes.append(vote)
+
+        await wait_for_sync(context.termination_votes, len(context.peers) + 1, context.log, "TERMINATION VOTES")
         if TerminationVote.AGAINST in context.termination_votes:
             return State.TRAINING
         else:
@@ -35,7 +40,6 @@ def _get_message_handler(context: Context):
     async def message_handler(sender: Peer, content: str, _timestamp: datetime):
         context.log.info(f"Got termination vote from {sender}: {content}")
         vote = TerminationVote(content)
-        # TODO remember to add own vote
         context.termination_votes.append(vote)
     return message_handler
 

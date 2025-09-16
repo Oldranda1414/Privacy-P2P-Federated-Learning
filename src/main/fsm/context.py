@@ -2,6 +2,7 @@ from asyncio import Task
 
 from fsm.state import State
 from fsm.handler.shutdown import get_stop
+from fsm.handler.termination import TerminationVote
 
 from machine_learning.model import Model
 from machine_learning.dataset import Dataset
@@ -9,7 +10,6 @@ from machine_learning.history import History
 from machine_learning.weights import Weights
 
 from communication.communicator import AsyncCommunicator
-from fsm.handler.termination import TerminationVote
 from utils.logger import get_logger
 from peers import Peer, load_self, load_peers
 from heartbeat import HeartbeatService
