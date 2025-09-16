@@ -40,7 +40,7 @@ def initialized_util():
 def baseline_accuracy():
     model = Model()
     model.initialize()
-    dataset = _load_IMDB
+    dataset = _load_IMDB()
     for _ in range(15):
         history = model.train(dataset)
         print(f"validation accuracy: {history.validation_accuracy}")
