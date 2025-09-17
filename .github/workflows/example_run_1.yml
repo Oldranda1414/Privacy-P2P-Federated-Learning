@@ -21,4 +21,5 @@ jobs:
 
       - name: Run program
         run: |
-          nix develop --command just run 3
+          nix develop --command just run 1
+
