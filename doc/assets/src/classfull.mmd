@@ -9,11 +9,10 @@ classDiagram
         main()
     }
     main ..> asyncio
-    main ..> peers
-    main ..> AsyncCommunicator
-    main ..> PollingService
     main ..> FiniteStateMachine
+    main ..> shutdown
     main ..> logger
+    main ..> environment
 
     class logger {
         get_logger(name: str, fmt: str) -> Logger
@@ -25,45 +24,208 @@ classDiagram
     }
     environment ..> os
 
-    %% polling.py
-    class PollingService {
-        \_\_init\_\_(comm, peers, shutdown_cb, interval, timeout, verbose)
+    %% heartbeat.py
+    class HeartbeatService {
+        \_\_init\_\_(comm, peers, shutdown_cb, interval, timeout, quiet)
         run()
     }
-    PollingService ..> asyncio
-    PollingService ..> datetime
-    PollingService ..> AsyncCommunicator
-    PollingService ..> MessageType
-    PollingService ..> Peer
-    PollingService ..> logger
+    HeartbeatService ..> asyncio
+    HeartbeatService ..> datetime
+    HeartbeatService ..> AsyncCommunicator
+    HeartbeatService ..> MessageType
+    HeartbeatService ..> Peer
+    HeartbeatService ..> logger
 
-    %% fsm.py
+    %% fsm
+
+    %%% finite_state_machine.py
     class FiniteStateMachine {
-        \_\_init\_\_(comm: AsyncCommunicator, peers: dict[str, Peer], rounds: int)
+        context: Context
+        \_\_init\_\_(quiet: bool, handler_quiet: bool)
         run()
-        shutdown()
     }
     FiniteStateMachine ..> asyncio
-    FiniteStateMachine ..> random
-    FiniteStateMachine ..> logger
-    FiniteStateMachine ..> AsyncCommunicator
+    FiniteStateMachine ..> State
+    FiniteStateMachine ..> Context
+    FiniteStateMachine ..> setup
+    FiniteStateMachine ..> training
+    FiniteStateMachine ..> secure_average_computation
+    FiniteStateMachine ..> termination
+    FiniteStateMachine ..> saving
+    FiniteStateMachine ..> shutdown
+    FiniteStateMachine ..> connecting
     FiniteStateMachine ..> MessageType
-    FiniteStateMachine ..> Peer
+    FiniteStateMachine ..> logger
+
+    %%% state.py
+    class State {
+        CONNECTING
+        SETUP
+        TRAINING
+        SECURE_AVERAGE_COMPUTATION
+        SAVING_MODEL
+        TERMINATION_CHECK
+        SHUTDOWN
+    }
+    <<enum>> State
+    State <|-- Enum
+
+    %%% context.py
+    class Context {
+        \_\_init\_\_(quiet: bool)
+        owner: Peer
+        peers: list[Peer]
+        state: State
+        active: bool
+        premature_stop: bool
+        comm: AsyncCommunicator
+        heartbeat_service: HeartbeatService
+        heartbeat_task: Task | None
+        log: Logger
+        sync_peers: set[Peer]
+        model: Model
+        dataset: Dataset | None
+        training_history: History | None
+        received: ReceivedWeights
+        termination_votes: list[TerminationVote]
+        rounds_done: int
+    }
+    Context ..> asyncio
+    Context ..> State
+    Context ..> TerminationVote
+    Context ..> Model
+    Context ..> Dataset
+    Context ..> History
+    Context ..> Weights
+    Context ..> AsyncCommunicator
+    Context ..> logger
+    Context ..> Peer
+    Context ..> peers
+    Context ..> HeartbeatService
+
+    class ReceivedWeights {
+        partitions: list[Weights]
+        subtotals: list[Weights]
+        \_\_init\_\_()
+        reset()
+    }
+    ReceivedWeights ..> Weights
+
+    %%% handler/
+
+    %%%% connecting.py
+    class connecting {
+        get_connecting_handler(context: Context) -> Callable[[], Awaitable[State]]
+    }
+    connecting ..> asyncio
+    connecting ..> Peer
+    connecting ..> State
+    connecting ..> Context
+
+    %%%% saving.py
+    class saving {
+        get_saving_handler(context: Context) -> Callable[[], Awaitable[State]]
+    }
+    saving ..> State
+    saving ..> Context
+
+    %%%% secure_average_computation.py
+    class secure_average_computation {
+        get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]
+    }
+    secure_average_computation ..> datetime
+    secure_average_computation ..> MessageType
+    secure_average_computation ..> Encodable
+    secure_average_computation ..> AsyncCommunicator
+    secure_average_computation ..> State
+    secure_average_computation ..> Context
+    secure_average_computation ..> waiting
+    secure_average_computation ..> sac
+    secure_average_computation ..> Peer
+    secure_average_computation ..> Weights
+    secure_average_computation ..> weights
+
+    %%%% setup.py
+    class setup {
+        get_setup_handler(context: Context) -> Callable[[], Awaitable[State]]
+    }
+    setup ..> asyncio
+    setup ..> datetime
+    setup ..> State
+    setup ..> Context
+    setup ..> MessageType
+    setup ..> Encodable
+    setup ..> Weights
+    setup ..> dataset
+
+    %%%% shutdown.py
+    class shutdown {
+        get_shutdown_handler(context: Context) -> Callable[[], Awaitable[State]]
+        get_stop(context: Context) -> Callable[[], Awaitable[None]]
+    }
+    shutdown ..> asyncio
+    shutdown ..> State
+    shutdown ..> Context
+
+    %%%% termination.py
+    class TerminationVote {
+        IN_FAVOR
+        AGAINST
+    }
+    <<enum>> TerminationVote
+    TerminationVote <|-- Enum
+
+    class termination {
+        get_termination_handler(context: Context) -> Callable[[], Awaitable[State]]
+    }
+    termination ..> datetime
+    termination ..> Context
+    termination ..> State
+    termination ..> waiting
+    termination ..> MessageType
+    termination ..> Peer
+
+    %%%% training.py
+    class training {
+        get_training_handler(context: Context) -> Callable[[], Awaitable[State]]
+    }
+    training ..> datetime
+    training ..> State
+    training ..> Context
+    training ..> waiting
+    training ..> MessageType
+    training ..> Peer
+
+    %%%% waiting.py
+    class waiting {
+        wait_for_sync(collection: Sized, filled_len: int, log: Logger, name: str)
+    }
+    waiting ..> asyncio
+    waiting ..> logging
 
     %% communication/
 
     %%% message.py
     class MessageType {
         HANDSHAKE
-        POLLING
-        FSM
+        HANDSHAKE_ACK
+        HEARTBEAT
+        SYNC
+        INITIAL_WEIGHTS
+        PARTITIONED_WEIGHTS
+        SUBTOTAL_WEIGHTS
+        TERMINATION
     }
     <<enum>> MessageType
     MessageType <|-- Enum
 
     class Message {
+        message_type: MessageType
+        sender: Peer
+        receiver: Peer
+        content: str | Encodable
+        timestamp: datetime
         \_\_init\_\_(message_type, sender, receiver, content, timestamp)
-
         to_dict(obj: Message) -> dict
         from_dict(data: dict) -> Message
         encode(obj: Message) -> bytes
@@ -74,12 +236,15 @@ classDiagram
     Message ..> json
     Message ..> Peer
     Message ..> MessageType
+    Message ..> Weights
+    Message ..> logger
 
     %%% communicator.py
     class AsyncCommunicator {
-        \_\_init\_\_(peer: Peer, verbose: bool = False)
+        \_\_init\_\_(peer: Peer, quiet: bool = False)
         start_server()
         stop_server()
+        shutdown()
         connect_to_peer(peer: Peer)
         send_message(receiver, message_type, content)
         register_message_handler(message_type, handler)
@@ -91,6 +256,7 @@ classDiagram
     AsyncCommunicator ..> Peer
     AsyncCommunicator ..> Message
     AsyncCommunicator ..> MessageType
+    AsyncCommunicator ..> Encodable
 
     %%% encodable.py
     class Encodable {
@@ -104,8 +270,10 @@ classDiagram
 
     %% peers.py
     class peers {
+        get_peer_number() -> int
         load_self(peers_file: str) -> Peer
         load_peers(peers_file: str) -> dict[str, Peer]
+        load_all_peers() -> dict[str, Peer]
     }
     peers ..> Peer
     peers ..> environment
@@ -114,9 +282,6 @@ classDiagram
 
     class Peer {
         \_\_init\_\_(node_id: str, host: str, port: int)
-        \_\_hash\_\_()
-        \_\_eq\_\_(other: Peer)
-
         to_dict(obj: Peer) -> dict
         from_dict(data: dict) -> Peer
         encode(obj: Peer) -> bytes

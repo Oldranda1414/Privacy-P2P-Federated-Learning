@@ -9,10 +9,8 @@ from fsm.handler.waiting import wait_for_sync
 from communication.message import MessageType
 from peers import Peer
 
-# TODO check if this is a good value
 ACCURACY_THRESHOLD = 0.88
 
-# Make termination vote Encodable
 class TerminationVote(Enum):
     IN_FAVOR = "in_favor"
     AGAINST = "against"

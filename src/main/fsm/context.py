@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 from asyncio import Task
 
 from fsm.state import State
-from fsm.handler.shutdown import get_stop
 if TYPE_CHECKING: # Importing only for type checking to prevent circular import
     from fsm.handler.termination import TerminationVote
 
@@ -23,14 +22,13 @@ CONNECTION_TIMEOUT = 10
 class Context:
     def __init__(self, quiet: bool = True):
         self.owner = load_self()
-        # TODO check if peers are ever used as dictionary or if they are always turned to list
         self.peers = load_peers()
         self.state = State.CONNECTING
         self.active = True
         self.premature_stop = False
 
         self.comm = AsyncCommunicator(self.owner, CONNECTION_TIMEOUT)
-        self.heartbeat_service = HeartbeatService(self.comm, self.peers, self.premature_stop_protocol, PULSE_INTERVAL, TIMEOUT)
+        self.heartbeat_service = HeartbeatService(self.comm, self.peers, self._premature_stop_protocol, PULSE_INTERVAL, TIMEOUT)
         self.heartbeat_task: Task | None = None
 
         self.log = get_logger("context")
@@ -45,7 +43,7 @@ class Context:
         self.termination_votes: list[TerminationVote] = []
         self.rounds_done = 0
 
-    async def premature_stop_protocol(self):
+    async def _premature_stop_protocol(self):
         self.premature_stop = True
 
 class ReceivedWeights:

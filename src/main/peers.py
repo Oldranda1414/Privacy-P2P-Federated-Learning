@@ -48,7 +48,7 @@ class Peer(Encodable):
         obj = json.loads(data.decode().strip())
         return cls.from_dict(obj)
 
-def get_peer_number():
+def get_peer_number() -> int:
     peers = _load_peer_file()
     return len(peers)
 

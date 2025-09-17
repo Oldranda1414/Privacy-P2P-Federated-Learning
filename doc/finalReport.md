@@ -105,14 +105,13 @@ How should entities be modularised?
 (UML Component/Package/Deployment Diagrams)
 -->
 
-See [Figure 1](#figure1)
+A high level architecture is shown in [Figure 1](#figure1).
 
 ![High Level Design](./assets/mermaid/hldesign.png){#figure1}
 
-See [Figure 2](#figure2), some typings have been removed from longer method signatures for rappresentational purpose.
+The full class diagram is shown in [Figure 2](#figure2), although some typings have been removed from longer method signatures for rappresentational purpose.
 
 ![Full Class Diagram](./assets/mermaid/classfull.png){#figure2}
-
 
 ### Behaviour
 
@@ -134,14 +133,7 @@ How should entities interact with each other?
 
 ## Implementation Details
 
-<!--
-Just report interesting / non-trivial / non-obvious implementation details.
-
-This section is expected to be short in case some documentation (e.g. Javadoc or Swagger Spec) has been produced for the software artifacts.
-This this case, the produced documentation should be referenced here.
--->
-
-TODO generate doc?
+Some interesting implementation details are reported in the following.
 
 ### FiniteStateMachine
 

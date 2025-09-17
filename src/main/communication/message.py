@@ -26,10 +26,10 @@ _decodable_contents: dict[MessageType, Type[Encodable]] = {
         MessageType.SUBTOTAL_WEIGHTS: Weights
     }
 
-def has_decodeable_contents(message_type: MessageType) -> bool:
+def _has_decodeable_contents(message_type: MessageType) -> bool:
     return message_type in _decodable_contents.keys()
 
-def get_contents_type(message_type: MessageType) -> type[Encodable]:
+def _get_contents_type(message_type: MessageType) -> type[Encodable]:
     return _decodable_contents[message_type]
 
 class Message(Encodable):
@@ -73,8 +73,8 @@ class Message(Encodable):
         """Decode JSON string to instance."""
         obj = json.loads(data.decode().strip())
         message_type = obj["type"]
-        if has_decodeable_contents(message_type):
-            ContentsType = get_contents_type(message_type)
+        if _has_decodeable_contents(message_type):
+            ContentsType = _get_contents_type(message_type)
             obj["content"] = ContentsType.from_dict(obj["content"])
         return cls.from_dict(obj)
 

@@ -16,7 +16,8 @@ stateDiagram-v2
         SecureAverageComputation --> [*] : model complete
     }
     Executing --> SavingPartialModel : peer failure detected
-    Executing --> SavingModel : execution completed
+    Executing --> TerminationCheck : execution completed
+    TerminationCheck --> SavingModel : all peers reached desired accuracy
     SavingModel --> Shutdown : model saved
     SavingPartialModel --> Shutdown : partial model saved
     Shutdown --> [*]

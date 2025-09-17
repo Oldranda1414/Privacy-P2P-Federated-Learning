@@ -9,7 +9,6 @@ from fsm.context import Context
 CONNECTION_ATTEMPTS = 5
 
 def get_connecting_handler(context: Context) -> Callable[[], Awaitable[State]]:
-
     async def connecting_handler() -> State:
         """Try connecting to all peers, with retries. Shutdown if any fail."""
         for peer in context.peers.values():
@@ -24,7 +23,6 @@ def get_connecting_handler(context: Context) -> Callable[[], Awaitable[State]]:
         context.log.info("Successfully connected to all peers")
         _start_heartbeat_service(context)
         return State.SETUP
-
     return connecting_handler
 
 async def _try_connect(peer: Peer, context: Context) -> bool:
