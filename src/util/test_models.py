@@ -75,8 +75,8 @@ def main():
         peer_models_accuracies.append(model.evaluate(x_test, y_test)[1])
 
     print(f"original accuracy: {original_accuracy}")
-    for accuracy in peer_models_accuracies:
-        print(f"peer models accuracies: {accuracy}")
+    for i, accuracy in enumerate(peer_models_accuracies):
+        print(f"peer {i + 1} models accuracies: {accuracy}")
 
 if __name__ == "__main__":
     main()

@@ -20,7 +20,6 @@ def get_sac_handler(context: Context) -> Callable[[], Awaitable[State]]:
         peers = list(context.peers.values())
         number_of_peers = len(peers)
         number_of_partitions = number_of_peers + 1
-        context.log.info("doing sac...")
 
         weight_partitions = generate_partitions(context.model.get_weights(), number_of_partitions)
         kept_partition = weight_partitions[0]

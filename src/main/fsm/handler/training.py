@@ -12,7 +12,6 @@ def get_training_handler(context: Context) -> Callable[[], Awaitable[State]]:
     context.comm.register_message_handler(MessageType.SYNC, _get_message_handler(context))
     async def training_handler() -> State:
         if context.dataset:
-            context.log.info(f"training...")
             try: 
                 context.training_history = context.model.train(context.dataset)
             except Exception as e:

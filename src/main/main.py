@@ -7,8 +7,8 @@ from environment import get_self_id
 
 async def main():
     log = get_logger("main")
-
-    fsm = FiniteStateMachine((not get_self_id() == "node2"), (not get_self_id() == "node2"))
+    focus_node = "node2"
+    fsm = FiniteStateMachine((not get_self_id() == focus_node), (not get_self_id() == focus_node))
     # fsm = FiniteStateMachine(False, False)
     fsm_task = create_task(fsm.run())
 
