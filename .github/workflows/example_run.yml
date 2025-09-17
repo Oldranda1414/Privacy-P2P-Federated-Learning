@@ -1,0 +1,29 @@
+name: Execute Example Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run-program:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v4
+        with:
+          version: '24.0.5'
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v22
+        with:
+          nix_path: nixpkgs=channel:nixos-24.11
+
+      - name: Run program
+        run: |
+          nix develop --command just run 3
