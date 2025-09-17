@@ -1,0 +1,65 @@
+---
+config:
+  theme: base
+  look: classic
+---
+sequenceDiagram
+    participant Peer1
+    participant Peer2
+    participant Peer3
+
+    %% Initial weight distribution
+    Peer1->>Peer2: Send initial weights
+    Peer1->>Peer3: Send initial weights
+
+    %% Training phase
+    Peer1->>Peer1: Train model
+    Peer2->>Peer2: Train model
+    Peer3->>Peer3: Train model
+
+    %% Ready messages
+    Peer1->>Peer2: Ready for SAC
+    Peer1->>Peer3: Ready for SAC
+    Peer2->>Peer1: Ready for SAC
+    Peer2->>Peer3: Ready for SAC
+    Peer3->>Peer1: Ready for SAC
+    Peer3->>Peer2: Ready for SAC
+
+    %% Partitioned weights exchange
+    Peer1->>Peer2: Send partitioned weights
+    Peer1->>Peer3: Send partitioned weights
+    Peer2->>Peer1: Send partitioned weights
+    Peer2->>Peer3: Send partitioned weights
+    Peer3->>Peer1: Send partitioned weights
+    Peer3->>Peer2: Send partitioned weights
+
+    %% Calculate subtotal
+    Peer1->>Peer1: Calculate subtotal
+    Peer2->>Peer2: Calculate subtotal
+    Peer3->>Peer3: Calculate subtotal
+
+    %% Subtotal weights exchange
+    Peer1->>Peer2: Send subtotal weights
+    Peer1->>Peer3: Send subtotal weights
+    Peer2->>Peer1: Send subtotal weights
+    Peer2->>Peer3: Send subtotal weights
+    Peer3->>Peer1: Send subtotal weights
+    Peer3->>Peer2: Send subtotal weights
+
+    %% Weight aggregation
+    Peer1->>Peer1: Calculate new weights
+    Peer2->>Peer2: Calculate new weights
+    Peer3->>Peer3: Calculate new weights
+
+    %% Termination agreement
+    Peer1->>Peer2: Agree to terminate
+    Peer1->>Peer3: Agree to terminate
+    Peer2->>Peer1: Agree to terminate
+    Peer2->>Peer3: Agree to terminate
+    Peer3->>Peer1: Agree to terminate
+    Peer3->>Peer2: Agree to terminate
+
+    %% Shutdown
+    Peer1->>Peer1: Save model & shutdown
+    Peer2->>Peer2: Save model & shutdown
+    Peer3->>Peer3: Save model & shutdown

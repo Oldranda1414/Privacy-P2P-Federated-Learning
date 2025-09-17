@@ -109,7 +109,7 @@ A high level architecture is shown in [Figure 1](#figure1).
 
 ![High Level Design](./assets/mermaid/hldesign.png){#figure1}
 
-The full class diagram is shown in [Figure 2](#figure2), although some typings have been removed from longer method signatures for rappresentational purpose. To better navigate the image it is recommended to checkout [the png on github]() directly.
+The full class diagram is shown in [Figure 2](#figure2), although some typings have been removed from longer method signatures for rappresentational purpose. To better navigate the image it is recommended to checkout [the png on github](https://github.com/Oldranda1414/Privacy-P2P-Federated-Learning/blob/main/doc/assets/classfull.png) directly.
 
 ![Full Class Diagram](./assets/mermaid/classfull.png){#figure2}
 
@@ -121,15 +121,23 @@ How should each entity behave?
 (UML State diagram or Activity Diagram)
 -->
 
-See [Figure 3](#figure3)
+The beheviour of the peers can be easily represented with the state diagram in [Figure 3](#figure3).
 
 ![State Diagram](./assets/mermaid/state.png){#figure3}
 
 ### Interaction
 
+<!--
 How should entities interact with each other?
 
 (UML Sequence Diagram)
+-->
+
+The sequence diagram in [Figure 4](#figure4) shows the interactions that take place between peers in a 3 peer system example. The diagram omits the trivial initial connection step. In this example all nodes agree to terminate the algorithm with the current step, but if one node would have not agreed then all nodes would have started a new iteration. This is repeated untill all nodes agree that the algorithm can terminate.
+
+![Sequence Diagram](./assets/mermaid/sequence.png){#figure4}
+
+All peers keep track of eachother's liveliness through heartbeat messages. Every peer broadcasts to all other peers a heartbeat message every given interval proving it is still running. If a peer does not receive a heartbeat message from another peer in a given timeframe than the other peer is considered dead. Because of the computationally intense operations involved in the algorithm and because the failure of a peer puts in jeopardy the entire algorithms execution, if this happens all other peers save their partially trained models and shutdown. Ideally the algorithm could be restarted, after ensuring the failing peer is back online, by using the partially trained models as a new starting point.
 
 ## Implementation Details
 
