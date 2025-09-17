@@ -38,5 +38,5 @@ BASENAME="fullclass"
 FILE="$SRC_FOLDER/$BASENAME.mmd"
 
 if [[ -f "$FILE" ]]; then
-  mmdc -i "$FILE" -o "$OUT_FOLDER"/"$BASENAME".png -q --scale 7
+  mmdc -i "$FILE" -o "$OUT_FOLDER"/"$BASENAME".png -q --scale 20
 fi

@@ -109,7 +109,7 @@ A high level architecture is shown in [Figure 1](#figure1).
 
 ![High Level Design](./assets/mermaid/hldesign.png){#figure1}
 
-The full class diagram is shown in [Figure 2](#figure2), although some typings have been removed from longer method signatures for rappresentational purpose.
+The full class diagram is shown in [Figure 2](#figure2), although some typings have been removed from longer method signatures for rappresentational purpose. To better navigate the image it is recommended to checkout [the png on github]() directly.
 
 ![Full Class Diagram](./assets/mermaid/classfull.png){#figure2}
 

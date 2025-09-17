@@ -8,13 +8,13 @@ from utils.required_init import requires_initialization
 
 class Model:
     def __init__(self):
-        self.keras_model = keras.Sequential([
+        self._keras_model = keras.Sequential([
             keras.Input(shape=(10000,)),
             layers.Dense(16, activation="relu"),
             layers.Dense(16, activation="relu"),
             layers.Dense(1, activation="sigmoid")
             ])
-        self.keras_model.compile(optimizer="rmsprop", loss="binary_crossentropy", metrics=["accuracy"])
+        self._keras_model.compile(optimizer="rmsprop", loss="binary_crossentropy", metrics=["accuracy"])
         self._initialized = False
 
     def initialize(self):
@@ -25,10 +25,10 @@ class Model:
 
     @requires_initialization
     def get_weights(self):
-        return Weights(self.keras_model.get_weights())
+        return Weights(self._keras_model.get_weights())
 
     def set_weights(self, new_weights: Weights):
-        self.keras_model.set_weights(new_weights.as_list())
+        self._keras_model.set_weights(new_weights.as_list())
         self.initialize()
 
     @requires_initialization
@@ -39,7 +39,7 @@ class Model:
         partial_x_train = x_train[validation_len:]
         y_val = y_train[:validation_len]
         partial_y_train = y_train[validation_len:]
-        keras_history = self.keras_model.fit(
+        keras_history = self._keras_model.fit(
                 partial_x_train,
                 partial_y_train,
                 epochs=1,
@@ -51,5 +51,5 @@ class Model:
 
     @requires_initialization
     def save(self, filepath: str):
-        self.keras_model.save(filepath)
+        self._keras_model.save(filepath)
 

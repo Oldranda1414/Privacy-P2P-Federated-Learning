@@ -14,15 +14,29 @@ classDiagram
     main ..> logger
     main ..> environment
 
+    class environment {
+        get_self_id() -> str
+    }
+    environment ..> os
+
+    class sac {
+        generate_partitions(weights, number_of_partitions, seed) -> list[Weights]:
+    }
+    sac ..> random
+    sac ..> Weights
+
+    %% utils
+
+    %%% logger.py
     class logger {
         get_logger(name: str, fmt: str) -> Logger
     }
     logger ..> logging
 
-    class environment {
-        get_self_id() -> str
+    %%% required_init.py
+    class required_init {
+        requires_initialization(method)
     }
-    environment ..> os
 
     %% heartbeat.py
     class HeartbeatService {
@@ -35,6 +49,72 @@ classDiagram
     HeartbeatService ..> MessageType
     HeartbeatService ..> Peer
     HeartbeatService ..> logger
+
+    %% machine_learning
+    %%% dataset.py
+    class dataset {
+        get_validation_length() -> int
+        get_dataset(owner: Peer) -> Dataset
+    }
+    dataset ..> os
+    dataset ..> peers
+    dataset ..> Peer
+
+    class Dataset {
+        train: tuple[ndarray, ndarray]
+        test: tuple[ndarray, ndarray]
+        \_\_init\_\_(train, test)
+        as_tuples()
+    }
+    Dataset ..> numpy
+
+    %%% history.py
+    class History {
+        train_accuracy: list[float]
+        train_loss: list[float]
+        validation_accuracy: list[float]
+        validation_loss: list[float]
+        \_\_init\_\_(train_accuracy, train_loss, validation_accuracy, validation_loss)
+    }
+
+    %%% model.py
+    class Model {
+        \_\_init\_\_()
+        initialize()
+        is_initialized()
+        get_weights()
+        set_weights(new_weights: Weights)
+        train(dataset: Dataset) -> History
+        save(filepath: str)
+    }
+    Model ..> tensorflow
+    Model ..> Weights
+    Model ..> Dataset
+    Model ..> dataset
+    Model ..> History
+    Model ..> required_init
+
+    %%% weights.py
+    class weights {
+        sum_weights(weights_list: list[Weights]) -> Weights
+    }
+    weights ..> Weights
+    weights ..> functools
+    weights ..> operator
+
+    class Weights {
+        \_\_init\_\_(weight_list: list[ndarray])
+        as_list(self) -> list[ndarray]
+        as_flat_vector() -> np.ndarray
+        from_flat_vector(flat: np.ndarray)
+        to_dict(obj: Weights) -> dict
+        from_dict(data: dict) -> Weights
+        encode(obj: Weights) -> bytes
+        decode(data: bytes) -> Weights
+    }
+    Weights <|-- Encodable
+    Weights ..> json
+    Weights ..> numpy
 
     %% fsm
 
@@ -229,7 +309,7 @@ classDiagram
         to_dict(obj: Message) -> dict
         from_dict(data: dict) -> Message
         encode(obj: Message) -> bytes
-        decode(data: bytes) -> Peer
+        decode(data: bytes) -> Message
     }
     Message <|-- Encodable
     Message ..> datetime
@@ -307,17 +387,20 @@ classDiagram
     <<builtin>> Enum
     class random:::builtin
     <<builtin>> random
+    class functools:::builtin
+    <<builtin>> functools
+    class operator:::builtin
+    <<builtin>> operator
 
     %% external dependencies
 
-    %% example
-    %% class docopt:::extern
-    %% <<extern>> docopt
+    class numpy:::extern
+    <<extern>> numpy
 
     %% legend
 
     class Builtin:::builtin
-    %% class Extern:::extern
+    class Extern:::extern
     %% class peers:::peers
     %% class Output:::serviceOutput
     %% class Check:::serviceCheck
@@ -329,7 +412,7 @@ classDiagram
     %% style
 
     classDef builtin fill:#BBDEFB,stroke:#1565C0,stroke-width:1px
-    %% classDef extern fill:#C8E6C9,stroke:#2E7D32,stroke-width:1px
+    classDef extern fill:#C8E6C9,stroke:#2E7D32,stroke-width:1px
     %% classDef peers fill:#FFE0B2,stroke:#EF6C00,stroke-width:1px
     %% classDef serviceOutput fill:#FFECB3,stroke:#FF9800,stroke-width:1px
     %% classDef serviceCheck fill:#FFF3E0,stroke:#FFB74D,stroke-width:1px
