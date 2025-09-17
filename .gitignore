@@ -1,7 +1,7 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
-build/
+src/build/
 dist/
 wheels/
 *.egg-info
@@ -14,7 +14,6 @@ wheels/
 .direnv
 
 # generated images folder
-!doc/build/*
 doc/build/*.pdf
 doc/assets/mermaid/*.png
 
