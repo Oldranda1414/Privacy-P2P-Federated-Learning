@@ -14,6 +14,7 @@ wheels/
 .direnv
 
 # generated images folder
+!doc/build/*
 doc/build/*.pdf
 doc/assets/mermaid/*.png
 
