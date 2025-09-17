@@ -1,5 +1,9 @@
 set quiet
 
+# List available recipies
+default:
+  just --list --unsorted --list-heading $'Available commands:\n'
+
 # Run the p2p simulation
 [no-exit-message]
 run *peer_number:
@@ -62,8 +66,4 @@ doc:
 [no-exit-message]
 test:
   uv --project src run src/main/test.py
-
-# List available recipies
-default:
-  just --list --unsorted --list-heading $'Available commands:\n'
 
