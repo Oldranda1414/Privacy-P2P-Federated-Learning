@@ -27,9 +27,10 @@ class Context:
         self.peers = load_peers()
         self.state = State.CONNECTING
         self.active = True
+        self.premature_stop = False
 
         self.comm = AsyncCommunicator(self.owner, CONNECTION_TIMEOUT)
-        self.heartbeat_service = HeartbeatService(self.comm, self.peers, get_stop(self), PULSE_INTERVAL, TIMEOUT)
+        self.heartbeat_service = HeartbeatService(self.comm, self.peers, self.premature_stop_protocol, PULSE_INTERVAL, TIMEOUT)
         self.heartbeat_task: Task | None = None
 
         self.log = get_logger("context")
@@ -43,6 +44,9 @@ class Context:
 
         self.termination_votes: list[TerminationVote] = []
         self.rounds_done = 0
+
+    async def premature_stop_protocol(self):
+        self.premature_stop = True
 
 class ReceivedWeights:
     def __init__(self):

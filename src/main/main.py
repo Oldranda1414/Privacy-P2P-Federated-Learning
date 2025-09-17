@@ -9,7 +9,6 @@ async def main():
     log = get_logger("main")
     focus_node = "node2"
     fsm = FiniteStateMachine((not get_self_id() == focus_node), (not get_self_id() == focus_node))
-    # fsm = FiniteStateMachine(False, False)
     fsm_task = create_task(fsm.run())
 
     try:

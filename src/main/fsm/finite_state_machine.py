@@ -31,8 +31,12 @@ class FiniteStateMachine:
         """Main FSM loop"""
         await self.context.comm.start_server()
         await sleep(10)
-        while self.context.active:
+        while self.context.active and not self.context.premature_stop:
             await self._loop()
+        if self.context.premature_stop:
+            self.context.state = State.SAVING_MODEL
+            while self.context.active:
+                await self._loop()
 
     async def _loop(self):
         handler = self.handlers[self.context.state]
