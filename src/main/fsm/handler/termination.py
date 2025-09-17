@@ -11,7 +11,6 @@ from peers import Peer
 
 # TODO check if this is a good value
 ACCURACY_THRESHOLD = 0.88
-MAX_ROUNDS = 15
 
 # Make termination vote Encodable
 class TerminationVote(Enum):
@@ -51,8 +50,6 @@ def _training_complete(context: Context) -> bool:
         current_accuracy = context.training_history.validation_accuracy[-1]
         context.log.info(f"accuracy obtained: {current_accuracy}")
         if current_accuracy >= ACCURACY_THRESHOLD:
-            return True
-        elif context.rounds_done >= MAX_ROUNDS:
             return True
     return False
 

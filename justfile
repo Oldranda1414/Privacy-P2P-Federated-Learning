@@ -3,28 +3,18 @@ set quiet
 # Run the p2p simulation
 [no-exit-message]
 run *peer_number:
+  just generate_configs {{peer_number}}
   just download_dataset
   just remove_venv
   just clean
-  docker compose -f docker/docker-compose.yml build
-  docker compose -f docker/docker-compose.yml up
+  docker compose -f docker/docker-compose.generated.yml build
+  docker compose -f docker/docker-compose.generated.yml up
   just test_models {{peer_number}}
 
-# Clean docker images
+# Generate config files
 [no-exit-message]
-clean:
-  docker compose -f docker/docker-compose.yml down
-  docker image prune -af
-
-# Add python module to project dependencies
-[no-exit-message]
-add *modules:
-  uv --project src add {{modules}}
-
-# Remove python module from project dependencies
-[no-exit-message]
-remove *modules:
-  uv --project src remove {{modules}}
+generate_configs *peer_number:
+  uv --project src run src/util/generate_configs.py {{peer_number}}
 
 # Download the imdb dataset
 [no-exit-message]
@@ -36,10 +26,26 @@ download_dataset:
 remove_venv:
   ./src/util/remove_venv.sh
 
+# Clean docker images
+[no-exit-message]
+clean:
+  docker compose -f docker/docker-compose.generated.yml down
+  docker image prune -af
+
 # Test peer models against local model
 [no-exit-message]
 test_models *peer_number:
   uv --project src run src/util/test_models.py {{peer_number}}
+
+# Add python module to project dependencies
+[no-exit-message]
+add *modules:
+  uv --project src add {{modules}}
+
+# Remove python module from project dependencies
+[no-exit-message]
+remove *modules:
+  uv --project src remove {{modules}}
 
 # Build the final report
 [no-exit-message]

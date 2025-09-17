@@ -20,5 +20,9 @@ doc/assets/mermaid
 # downloaded dataset directory
 dataset
 
-# node outputs:
+# node outputs
 docker/output/*
+
+# generated configs
+docker/docker-compose.generated.yml
+src/main/peers.json
